@@ -10,6 +10,9 @@
     "start": "node ./dist",
     "dev": "npm run build && npm run start"
   },
+  "devDependencies": {
+    "ts-standard": "^12.0.2"
+  },
   "dependencies": {
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
@@ -18,7 +21,6 @@
     "onnxruntime-node": "^1.23.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "ts-standard": "^12.0.2",
     "typescript": "^5.9.3"
   },
   "ts-standard": {

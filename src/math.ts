@@ -2,6 +2,9 @@ export const pi = Math.PI
 
 export const twoPi = 2 * pi
 
+export const X = 0
+export const Y = 1
+
 export function range (a: number, b?: number): number[] {
   if (b == null) return range(0, a - 1)
   return [...Array(b - a + 1).keys()].map(i => a + i)
@@ -31,31 +34,70 @@ export function dot (x: number[], y: number[]): number {
 }
 
 export function clamp (a: number, b: number, x: number): number {
-    return Math.max(a, Math.min(x, b))
-  }
-  
+  return Math.max(a, Math.min(x, b))
+}
 
-// export function normalize (vector: Vec2): Vec2 {
-//   const normalized = new Vec2(vector.x, vector.y)
-//   normalized.normalize()
-//   return normalized
-// }
+export function vecToAngle (vector: number[]): number {
+  const x = vector[0]
+  const y = vector[1]
+  return Math.atan2(y, x)
+}
 
-// export function dirToFrom (to: Vec2, from: Vec2): Vec2 {
-//   return normalize(Vec2.sub(to, from))
-// }
+export function angleToDir (angle: number): number[] {
+  return [Math.cos(angle), Math.sin(angle)]
+}
 
-// export function dirFromTo (from: Vec2, to: Vec2): Vec2 {
-//   return normalize(Vec2.sub(to, from))
-// }
+export function sub (a: number[], b: number[]): number[] {
+  return range(a.length).map(i => a[i] - b[i])
+}
 
-// export function vecToAngle (vector: Vec2): number {
-//   return Math.atan2(vector.y, vector.x)
-// }
+export function add (a: number[], b: number[]): number[] {
+  return range(a.length).map(i => a[i] + b[i])
+}
 
-// export function angleToDir (angle: number): Vec2 {
-//   return new Vec2(Math.cos(angle), Math.sin(angle))
-// }
+export function combine (a: number, v: number[], b: number, w: number[]): number[] {
+  return add(mul(a, v), mul(b, w))
+}
+
+export function mul (a: number, v: number[]): number[] {
+  return v.map(x => a * x)
+}
+
+export function getLength (v: number[]): number {
+  const squares = v.map(x => x ** 2)
+  return Math.sqrt(sum(squares))
+}
+
+export function normalize (v: number[]): number[] {
+  const length = getLength(v)
+  if (length === 0) return [0, 0]
+  return mul(1 / length, v)
+}
+
+export function dirToFrom (to: number[], from: number[]): number[] {
+  return normalize(sub(from, to))
+}
+
+export function dirFromTo (from: number[], to: number[]): number[] {
+  return normalize(sub(to, from))
+}
+
+export function whichMax (array: number[]): number {
+  let indexMax = 0
+  let valueMax = array[0]
+  array.forEach((value, index) => {
+    if (value > valueMax) {
+      indexMax = index
+      valueMax = value
+    }
+  })
+  return indexMax
+}
+
+export function whichMin (array: number[]): number {
+  const negArray = array.map(x => -x)
+  return whichMax(negArray)
+}
 
 // export function getAngleDiff (toAngle: number, fromAngle: number): number {
 //   const v = { x: Math.cos(fromAngle), y: Math.sin(fromAngle) }
@@ -89,23 +131,6 @@ export function clamp (a: number, b: number, x: number): number {
 //   if (length < maxLength) return vector
 //   const direction = normalize(vector)
 //   return Vec2.mul(direction, maxLength)
-// }
-
-// export function whichMax (array: number[]): number {
-//   let indexMax = 0
-//   let valueMax = array[0]
-//   array.forEach((value, index) => {
-//     if (value > valueMax) {
-//       indexMax = index
-//       valueMax = value
-//     }
-//   })
-//   return indexMax
-// }
-
-// export function whichMin (array: number[]): number {
-//   const negArray = array.map(x => -x)
-//   return whichMax(negArray)
 // }
 
 // export function project (a: Vec2, b: Vec2): Vec2 {
