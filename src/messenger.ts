@@ -22,8 +22,8 @@ export class Messenger {
       console.log(socket.id, 'connected')
       socket.emit('renderScale', this.server.config.renderScale)
       socket.on('action', (action: number) => {
-        if (this.world.circles.length > 0) {
-          this.world.circles[0].action = action
+        if (this.world.agents.length > 0) {
+          this.world.agents[0].action = action
         }
       })
       socket.on('disconnect', () => {

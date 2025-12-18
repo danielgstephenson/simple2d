@@ -68,6 +68,10 @@ export function getLength (v: number[]): number {
   return Math.sqrt(sum(squares))
 }
 
+export function getDistance (v: number[], w: number[]): number {
+  return getLength(sub(v, w))
+}
+
 export function normalize (v: number[]): number[] {
   const length = getLength(v)
   if (length === 0) return [0, 0]

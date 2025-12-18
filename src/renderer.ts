@@ -1,7 +1,9 @@
 import { Camera } from './camera'
-import { CircleSummary } from './entities/circle'
+import { Agent, AgentSummary } from './entities/agent'
+import { Arena, ArenaSummary } from './entities/arena'
+import { Blade, BladeSummary } from './entities/blade'
 import { WallSummary } from './entities/wall'
-import { X, Y } from './math'
+import { combine, dirFromTo, getDistance, X, Y } from './math'
 import { WorldSummary } from './world/world'
 
 export class Renderer {
@@ -10,14 +12,19 @@ export class Renderer {
   context: CanvasRenderingContext2D
   summary: WorldSummary
   renderScale = 1
-
   backgroundColor = 'hsl(0,0%,0%)'
-  wallColor = 'hsl(0,0%,35%)'
+  wallColor = 'hsl(0,0%,20%)'
+  traceColor = 'hsla(0, 0%, 10%, 1.00)'
+  springColor = 'hsla(0, 100%, 100%, 0.1)'
+  agentColors = ['hsla(220,100%, 45%, 1.0)', 'hsla(120, 100%, 30%, 1.0)']
+  bladeColors = ['hsla(220, 50%, 40%, 0.5)', 'hsla(120, 100%, 25%, 0.5)']
 
   constructor () {
     this.summary = {
       walls: [],
-      circles: []
+      blades: [],
+      agents: [],
+      arena: { boundary: [] }
     }
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
@@ -28,15 +35,71 @@ export class Renderer {
     window.requestAnimationFrame(() => this.draw())
     this.setupCanvas()
     this.followPlayer()
-    this.summary.circles.forEach(c => this.drawCircle(c))
+    this.drawArena(this.summary.arena)
+    this.summary.blades.forEach(b => this.drawSpring(b))
+    this.summary.blades.forEach(b => this.drawBlade(b))
+    this.summary.agents.forEach(c => this.drawAgent(c))
     this.summary.walls.forEach(w => this.drawWall(w))
   }
 
-  drawCircle (circle: CircleSummary): void {
+  drawArena (arena: ArenaSummary): void {
+    const boundary = arena.boundary
+    this.context.fillStyle = this.wallColor
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
     this.resetContext()
-    this.context.fillStyle = 'hsl(220,100%,40%)'
+    this.context.imageSmoothingEnabled = false
+    this.context.fillStyle = this.backgroundColor
     this.context.beginPath()
-    this.context.arc(circle.position[X], circle.position[Y], circle.radius, 0, 2 * Math.PI)
+    boundary.forEach((vertex, i) => {
+      if (i === 0) this.context.moveTo(vertex[X], vertex[Y])
+      else this.context.lineTo(vertex[X], vertex[Y])
+    })
+    this.context.fill()
+    this.context.save()
+    this.context.clip()
+    this.context.strokeStyle = this.traceColor
+    this.context.lineCap = 'round'
+    this.context.lineWidth = 0.2
+    this.context.beginPath()
+    this.context.arc(0, 0, 5, 0, 2 * Math.PI)
+    this.context.arc(0, 0, 10, 0, 2 * Math.PI)
+    this.context.arc(0, 0, 20, 0, 2 * Math.PI)
+    this.context.moveTo(0, Arena.size)
+    this.context.lineTo(0, -Arena.size)
+    this.context.moveTo(Arena.size, 0)
+    this.context.lineTo(-Arena.size, 0)
+    this.context.stroke()
+  }
+
+  drawSpring (blade: BladeSummary): void {
+    this.resetContext()
+    this.context.strokeStyle = this.springColor
+    this.context.lineWidth = 0.08
+    const agent = this.summary.agents[blade.id]
+    const distance = getDistance(blade.position, agent.position)
+    if (distance < Blade.radius + Agent.radius) return
+    const dir = dirFromTo(blade.position, agent.position)
+    const edgePoint = combine(1, blade.position, Blade.radius, dir)
+    this.context.lineCap = 'butt'
+    this.context.beginPath()
+    this.context.moveTo(edgePoint[X], edgePoint[Y])
+    this.context.lineTo(agent.position[X], agent.position[Y])
+    this.context.stroke()
+  }
+
+  drawBlade (blade: BladeSummary): void {
+    this.resetContext()
+    this.context.fillStyle = this.bladeColors[blade.id]
+    this.context.beginPath()
+    this.context.arc(blade.position[X], blade.position[Y], Blade.radius, 0, 2 * Math.PI)
+    this.context.fill()
+  }
+
+  drawAgent (agent: AgentSummary): void {
+    this.resetContext()
+    this.context.fillStyle = this.agentColors[agent.id]
+    this.context.beginPath()
+    this.context.arc(agent.position[X], agent.position[Y], Agent.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
@@ -51,11 +114,11 @@ export class Renderer {
   }
 
   followPlayer (): void {
-    if (this.summary.circles.length === 0) {
+    if (this.summary.agents.length === 0) {
       this.camera.position = [0, 0]
       return
     }
-    this.camera.position = this.summary.circles[0].position
+    this.camera.position = this.summary.agents[0].position
   }
 
   setupCanvas (): void {
