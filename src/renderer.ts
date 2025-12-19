@@ -1,9 +1,9 @@
 import { Camera } from './camera'
-import { Agent, AgentSummary } from './entities/agent'
+import { Agent } from './entities/agent'
 import { Arena, ArenaSummary } from './entities/arena'
-import { Blade, BladeSummary } from './entities/blade'
+import { Blade } from './entities/blade'
 import { WallSummary } from './entities/wall'
-import { combine, dirFromTo, getDistance, X, Y } from './math'
+import { combine, dirFromTo, getDistance, range, X, Y } from './math'
 import { WorldSummary } from './world/world'
 
 export class Renderer {
@@ -36,9 +36,10 @@ export class Renderer {
     this.setupCanvas()
     this.followPlayer()
     this.drawArena(this.summary.arena)
-    this.summary.blades.forEach(b => this.drawSpring(b))
-    this.summary.blades.forEach(b => this.drawBlade(b))
-    this.summary.agents.forEach(c => this.drawAgent(c))
+    const agentCount = this.summary.agents.length
+    range(agentCount).forEach(i => this.drawSpring(i))
+    range(agentCount).forEach(i => this.drawBlade(i))
+    range(agentCount).forEach(i => this.drawAgent(i))
     this.summary.walls.forEach(w => this.drawWall(w))
   }
 
@@ -71,11 +72,12 @@ export class Renderer {
     this.context.stroke()
   }
 
-  drawSpring (blade: BladeSummary): void {
+  drawSpring (i: number): void {
     this.resetContext()
     this.context.strokeStyle = this.springColor
     this.context.lineWidth = 0.08
-    const agent = this.summary.agents[blade.id]
+    const blade = this.summary.blades[i]
+    const agent = this.summary.agents[i]
     const distance = getDistance(blade.position, agent.position)
     if (distance < Blade.radius + Agent.radius) return
     const dir = dirFromTo(blade.position, agent.position)
@@ -87,17 +89,19 @@ export class Renderer {
     this.context.stroke()
   }
 
-  drawBlade (blade: BladeSummary): void {
+  drawBlade (i: number): void {
     this.resetContext()
-    this.context.fillStyle = this.bladeColors[blade.id]
+    const blade = this.summary.blades[i]
+    this.context.fillStyle = this.bladeColors[i]
     this.context.beginPath()
     this.context.arc(blade.position[X], blade.position[Y], Blade.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
-  drawAgent (agent: AgentSummary): void {
+  drawAgent (i: number): void {
     this.resetContext()
-    this.context.fillStyle = this.agentColors[agent.id]
+    const agent = this.summary.agents[i]
+    this.context.fillStyle = this.agentColors[i]
     this.context.beginPath()
     this.context.arc(agent.position[X], agent.position[Y], Agent.radius, 0, 2 * Math.PI)
     this.context.fill()

@@ -4,7 +4,7 @@ export class Input {
   keyboard = new Map<string, boolean>()
   mousePosition: number[] = [0, 0]
   mouseButtons = new Map<number, boolean>()
-  maxZoom = 20
+  maxZoom = 40
   minZoom = -100
   zoom = 0
 
