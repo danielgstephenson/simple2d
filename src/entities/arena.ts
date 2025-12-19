@@ -1,7 +1,7 @@
 import { World } from '../world/world'
 
 export class Arena {
-  static size = 50
+  static size = 100000
   world: World
   boundary: number[][]
 

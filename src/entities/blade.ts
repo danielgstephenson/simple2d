@@ -1,14 +1,12 @@
-import { pi } from '../math'
 import { World } from '../world/world'
 import { Circle, CircleSummary } from './circle'
 
 export class Blade extends Circle {
   static radius = 1
-  static drag = 0.3
-  static mass = pi
-  static movePower = 4
+  drag = 0.3
+  movePower = 4
   velocity = [0, 0]
-  actionForce = [0, 0]
+  force = [0, 0]
   collideForce = [0, 0]
 
   constructor (world: World, position = [0, 0]) {

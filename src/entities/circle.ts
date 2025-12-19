@@ -8,8 +8,9 @@ export class Circle {
   position: number[]
   id: number
   velocity = [0, 0]
-  actionForce = [0, 0]
-  collideForce = [0, 0]
+  force = [0, 0]
+  impulse = [0, 0]
+  shift = [0, 0]
   drag = 0
 
   constructor (world: World, position = [0, 0], radius = 0.5) {

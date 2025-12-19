@@ -4,7 +4,7 @@ import { Arena, ArenaSummary } from '../entities/arena'
 import { Blade } from '../entities/blade'
 import { Circle, CircleSummary } from '../entities/circle'
 import { Wall, WallSummary } from '../entities/wall'
-import { add, combine, dirFromTo, getDistance, mul, range } from '../math'
+import { combine, dirFromTo, dot, getDistance, mul, range, sub } from '../math'
 
 export class World {
   agents: Agent[] = []
@@ -23,8 +23,8 @@ export class World {
   }
 
   addAgent (position: number[]): Agent {
-    void new Blade(this, position)
-    return new Agent(this, position)
+    const agent = new Agent(this, position)
+    return agent
   }
 
   addWall (a: number[], b: number[]): Wall {
@@ -46,60 +46,71 @@ export class World {
     range(agentCount).forEach(i => {
       const agent = this.agents[i]
       const blade = this.blades[i]
-      agent.collideForce = [0, 0]
-      blade.collideForce = [0, 0]
+      agent.force = [0, 0]
+      blade.force = [0, 0]
+      agent.impulse = [0, 0]
+      blade.impulse = [0, 0]
+      agent.shift = [0, 0]
+      blade.shift = [0, 0]
     })
     range(agentCount).forEach(i => {
       const agent = this.agents[i]
-      agent.actionForce = mul(Agent.movePower, actionVectors[agent.action])
+      agent.force = mul(agent.movePower, actionVectors[agent.action])
     })
     range(agentCount).forEach(i => {
       const blade = this.blades[i]
       const agent = this.agents[i]
       const distance = getDistance(blade.position, agent.position)
       const dir = dirFromTo(blade.position, agent.position)
-      blade.actionForce = mul(Blade.movePower * distance, dir)
+      blade.force = mul(blade.movePower * distance, dir)
     })
     range(agentCount).forEach(i => {
       range(agentCount).forEach(j => {
         if (i >= j) return
-        const agent = this.agents[i]
-        const otherAgent = this.agents[j]
-        this.collideCircleCircle(agent, otherAgent)
-        const blade = this.blades[i]
-        const otherBlade = this.blades[j]
-        this.collideCircleCircle(blade, otherBlade)
+        const agent1 = this.agents[i]
+        const agent2 = this.agents[j]
+        this.collideCircleCircle(agent1, agent2)
+        const blade1 = this.blades[i]
+        const blade2 = this.blades[j]
+        this.collideCircleCircle(blade1, blade2)
       })
     })
-    this.blades.forEach(blade => {
-      const force = add(blade.actionForce, blade.collideForce)
-      blade.velocity = combine(1 - Blade.drag * dt, blade.velocity, dt / blade.mass, force)
-      blade.position = combine(1, blade.position, dt, blade.velocity)
+    this.circles.forEach(circle => {
+      circle.velocity = mul(1 - circle.drag * dt, circle.velocity)
+      circle.velocity = combine(1, circle.velocity, dt / circle.mass, circle.force)
+      circle.velocity = combine(1, circle.velocity, 1 / circle.mass, circle.impulse)
+      circle.position = combine(1, circle.position, dt, circle.velocity)
+      circle.position = combine(1, circle.position, 1, circle.shift)
     })
-    this.agents.forEach(agent => {
-      const force = add(agent.actionForce, agent.collideForce)
-      agent.velocity = combine(1 - Agent.drag * dt, agent.velocity, dt / agent.mass, force)
-      agent.position = combine(1, agent.position, dt, agent.velocity)
-    })
+    this.agents.forEach(agent => this.checkDeath(agent))
     this.summary = this.summarize()
   }
 
   collideCircleCircle (circle1: Circle, circle2: Circle): void {
     if (circle1.id >= circle2.id) return
-    const dt = this.timeStep
-    const agentFuturePos = combine(1, circle1.position, dt, circle1.velocity)
-    const otherFuturePos = combine(1, circle2.position, dt, circle2.velocity)
-    const distance = getDistance(agentFuturePos, otherFuturePos)
+    const distance = getDistance(circle1.position, circle2.position)
     const overlap = circle1.radius + circle2.radius - distance
     if (overlap <= 0) return
-    const intensity = 1
-    const depthFactor = 100
-    const power = intensity * depthFactor * Math.log(1 + Math.exp(-overlap / depthFactor))
     const normal = dirFromTo(circle1.position, circle2.position)
-    const otherForce = mul(+power, normal)
-    const agentForce = mul(-power, normal)
-    circle2.collideForce = add(circle2.actionForce, otherForce)
-    circle1.collideForce = add(circle1.actionForce, agentForce)
+    const relativeVelocity = sub(circle1.velocity, circle2.velocity)
+    const impactSpeed = dot(relativeVelocity, normal)
+    const massFactor = 1 / circle1.mass + 1 / circle2.mass
+    const impulse = mul(impactSpeed / massFactor, normal)
+    const shift = mul(0.5 * overlap, normal)
+    circle1.impulse = combine(1, circle1.impulse, -1, impulse)
+    circle2.impulse = combine(1, circle2.impulse, +1, impulse)
+    circle1.shift = combine(1, circle1.shift, -1, shift)
+    circle2.shift = combine(1, circle2.shift, +1, shift)
+  }
+
+  checkDeath (agent: Agent): void {
+    this.blades.forEach(blade => {
+      if (blade.id === agent.blade.id) return
+      const distance = getDistance(agent.position, blade.position)
+      const overlap = agent.radius + blade.radius - distance
+      if (overlap < 0) return
+      agent.die()
+    })
   }
 }
 
