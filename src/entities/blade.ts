@@ -1,5 +1,5 @@
 import { World } from '../world/world'
-import { Circle, CircleSummary } from './circle'
+import { Circle } from './circle'
 
 export class Blade extends Circle {
   static radius = 1
@@ -12,11 +12,5 @@ export class Blade extends Circle {
   constructor (world: World, position = [0, 0]) {
     super(world, position, Blade.radius)
     this.world.blades.push(this)
-  }
-
-  summarize (): CircleSummary {
-    return {
-      position: this.position
-    }
   }
 }

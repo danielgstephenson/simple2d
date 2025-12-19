@@ -2,6 +2,7 @@ import { Camera } from './camera'
 import { Agent } from './entities/agent'
 import { Arena, ArenaSummary } from './entities/arena'
 import { Blade } from './entities/blade'
+import { Circle } from './entities/circle'
 import { WallSummary } from './entities/wall'
 import { combine, dirFromTo, getDistance, range, X, Y } from './math'
 import { WorldSummary } from './world/world'
@@ -92,6 +93,14 @@ export class Renderer {
   drawBlade (i: number): void {
     this.resetContext()
     const blade = this.summary.blades[i]
+    const L = Circle.historyLength
+    blade.history.forEach((position, i) => {
+      const a = 0.02 * (L - i) / L
+      this.context.fillStyle = `hsla(0, 0%, 50%, ${a})`
+      this.context.beginPath()
+      this.context.arc(position[X], position[Y], Blade.radius, 0, 2 * Math.PI)
+      this.context.fill()
+    })
     this.context.fillStyle = this.bladeColors[i]
     this.context.beginPath()
     this.context.arc(blade.position[X], blade.position[Y], Blade.radius, 0, 2 * Math.PI)
@@ -101,6 +110,14 @@ export class Renderer {
   drawAgent (i: number): void {
     this.resetContext()
     const agent = this.summary.agents[i]
+    const L = Circle.historyLength
+    agent.history.forEach((position, i) => {
+      const a = 0.02 * (L - i) / L
+      this.context.fillStyle = `hsla(0, 0%, 50%, ${a})`
+      this.context.beginPath()
+      this.context.arc(position[X], position[Y], Agent.radius, 0, 2 * Math.PI)
+      this.context.fill()
+    })
     this.context.fillStyle = this.agentColors[i]
     this.context.beginPath()
     this.context.arc(agent.position[X], agent.position[Y], Agent.radius, 0, 2 * Math.PI)

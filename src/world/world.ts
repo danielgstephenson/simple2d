@@ -82,7 +82,13 @@ export class World {
       circle.position = combine(1, circle.position, dt, circle.velocity)
       circle.position = combine(1, circle.position, 1, circle.shift)
     })
-    this.agents.forEach(agent => this.checkDeath(agent))
+    this.circles.forEach(circle => {
+      circle.history.unshift(circle.position)
+      circle.history = circle.history.slice(0, Circle.historyLength)
+    })
+    this.agents.forEach(agent => {
+      this.checkDeath(agent)
+    })
     this.summary = this.summarize()
   }
 

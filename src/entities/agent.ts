@@ -1,7 +1,7 @@
 import { combine, normalize } from '../math'
 import { World } from '../world/world'
 import { Blade } from './blade'
-import { Circle, CircleSummary } from './circle'
+import { Circle } from './circle'
 
 export class Agent extends Circle {
   static radius = 0.5
@@ -24,11 +24,5 @@ export class Agent extends Circle {
     this.blade.position = structuredClone(this.position)
     this.velocity = [0, 0]
     this.blade.velocity = [0, 0]
-  }
-
-  summarize (): CircleSummary {
-    return {
-      position: this.position
-    }
   }
 }

@@ -2,11 +2,13 @@ import { pi } from '../math'
 import { World } from '../world/world'
 
 export class Circle {
+  static historyLength = 15
   world: World
   radius: number
   mass: number
   position: number[]
   id: number
+  history: number[][] = []
   velocity = [0, 0]
   force = [0, 0]
   impulse = [0, 0]
@@ -21,8 +23,16 @@ export class Circle {
     this.id = world.circles.length
     this.world.circles.push(this)
   }
+
+  summarize (): CircleSummary {
+    return {
+      position: this.position,
+      history: this.history
+    }
+  }
 }
 
 export interface CircleSummary {
   position: number[]
+  history: number[][]
 }
