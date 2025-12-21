@@ -18,7 +18,7 @@ export class Circle {
   constructor (world: World, position = [0, 0], radius = 0.5) {
     this.world = world
     this.radius = radius
-    this.mass = pi * this.radius ** 2
+    this.mass = pi * radius ** 2
     this.position = position
     this.id = world.circles.length
     this.world.circles.push(this)

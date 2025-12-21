@@ -11,14 +11,16 @@ export class Agent extends Circle {
   velocity = [0, 0]
   force = [0, 0]
   action = 0
+  dead = false
 
   constructor (world: World, position = [0, 0]) {
     super(world, position, Agent.radius)
     this.world.agents.push(this)
-    this.blade = new Blade(world, position)
+    this.blade = new Blade(this, position)
   }
 
-  die (): void {
+  respawn (): void {
+    this.dead = false
     const dir = normalize(this.position)
     this.position = combine(1, this.position, 15, dir)
     this.blade.position = structuredClone(this.position)

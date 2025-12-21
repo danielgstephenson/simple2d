@@ -14,7 +14,7 @@ export class World {
   arena: Arena
   summary: WorldSummary
   timeStep = 0.04
-  timeScale = 1
+  timeScale = 0.1
 
   constructor () {
     this.arena = new Arena(this)
@@ -60,9 +60,8 @@ export class World {
     range(agentCount).forEach(i => {
       const blade = this.blades[i]
       const agent = this.agents[i]
-      const distance = getDistance(blade.position, agent.position)
-      const dir = dirFromTo(blade.position, agent.position)
-      blade.force = mul(blade.movePower * distance, dir)
+      const vector = sub(agent.position, blade.position)
+      blade.force = mul(blade.movePower, vector)
     })
     range(agentCount).forEach(i => {
       range(agentCount).forEach(j => {
@@ -88,6 +87,9 @@ export class World {
     })
     this.agents.forEach(agent => {
       this.checkDeath(agent)
+    })
+    this.agents.forEach(agent => {
+      if (agent.dead) agent.respawn()
     })
     this.summary = this.summarize()
   }
@@ -115,7 +117,7 @@ export class World {
       const distance = getDistance(agent.position, blade.position)
       const overlap = agent.radius + blade.radius - distance
       if (overlap < 0) return
-      agent.die()
+      agent.dead = true
     })
   }
 }
