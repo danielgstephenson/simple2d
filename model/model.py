@@ -1,0 +1,113 @@
+from generator import Generator
+import torch
+from torch import Tensor, nn
+import torch.nn.functional as F
+import contextlib
+import io
+import os
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print("device = " + str(device))
+torch.set_printoptions(sci_mode=False)
+
+class ValueModel(torch.nn.Module):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.activation = torch.nn.ReLU()
+        inputSize = 16
+        k = 20
+        self.hiddenCount = 20
+        self.hiddenLayers = nn.ModuleList([nn.Linear(inputSize + i*k, k) for i in range(self.hiddenCount)])
+        self.outputLayer = nn.Linear(inputSize + self.hiddenCount*k, 1)
+    def forward(self, state: Tensor) -> Tensor:
+        x = state
+        for i in range(self.hiddenCount):
+            h = self.hiddenLayers[i]
+            y: Tensor = self.activation(h(x))
+            x = torch.cat((x,y),dim=1)
+        return self.outputLayer(x)
+    def __call__(self, *args, **kwds) -> Tensor:
+        return super().__call__(*args, **kwds)
+    
+def get_reward(state: Tensor)->Tensor:
+    fighterPos0 = state[:,0:2]
+    fighterPos1 = state[:,8:10]
+    weaponPos0 = state[:,4:6]
+    weaponPos1 = state[:,12:14]
+    dist0 = torch.sqrt(torch.sum(fighterPos0**2,dim=1))
+    dist1 = torch.sqrt(torch.sum(fighterPos1**2,dim=1))
+    close = torch.tensor(5)
+    dist0 = torch.maximum(dist0,close)
+    danger0 = torch.sqrt(torch.sum((fighterPos0-weaponPos1)**2,dim=1))
+    danger1 = torch.sqrt(torch.sum((fighterPos1-weaponPos0)**2,dim=1))
+    reward = dist1 - dist0 + 0.2 * (danger1 - danger0)
+    return reward.unsqueeze(1)
+
+def save_onnx(model: nn.Module, path: str):
+    with contextlib.redirect_stdout(io.StringIO()):
+        example_input = torch.tensor([[i for i in range(16)]],dtype=torch.float32).to(device)
+        example_input_tuple = (example_input,)
+        onnx_program = torch.onnx.export(model, example_input_tuple, dynamo=True)
+        if onnx_program is not None:
+            onnx_program.save(path)
+
+def save_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: str):
+    checkpoint = { 
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict()
+    }
+    try:
+        torch.save(checkpoint, path)
+    except KeyboardInterrupt:
+        print('\nKeyboardInterrupt detected. Saving checkpoint...')
+        torch.save(checkpoint, path)
+        print('Checkpoint saved.')
+        raise
+
+def load_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: str):
+    if os.path.exists(path):
+        checkpoint = torch.load(path, weights_only=False)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+model = ValueModel().to(device)
+old_model = get_reward
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+checkpoint_path = './checkpoints/checkpoint0.pt'
+load_checkpoint(model, optimizer, checkpoint_path)
+
+learning_rate = 0.001
+for param_group in optimizer.param_groups:
+    param_group['lr'] = learning_rate
+
+batch_size = 50000
+generator = Generator(batch_size, device)
+
+
+discount = 0.95
+self_noise = 0.1
+other_noise = 0.01
+print('Training...')
+for batch in range(1000000000):
+    data = generator.generate()
+    state = data[:,0:16]
+    output = model(state)
+    reward = get_reward(state)
+    futures = data[:,16:].reshape(-1,16)  
+    with torch.no_grad():        
+        future_values = old_model(futures)
+        value_matrices = future_values.reshape(batch_size,9,9)
+        means = torch.mean(value_matrices,2)
+        mins = torch.amin(value_matrices,2)
+        action_values = other_noise*means + (1-other_noise)*mins
+        max_value = torch.amax(action_values,1).unsqueeze(1)
+        average_value = torch.mean(action_values,1).unsqueeze(1)
+        future_value = self_noise*average_value + (1-self_noise)*max_value
+        target = (1-discount)*reward + discount*future_value
+    loss = F.mse_loss(output, target, reduction='mean')
+    loss_value = loss.detach().cpu().numpy()
+    loss.backward()
+    optimizer.step()
+    save_checkpoint(model, optimizer, checkpoint_path)
+    print(f'Batch: {batch}, Loss: {loss_value:05.2f}')

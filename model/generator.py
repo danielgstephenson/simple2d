@@ -3,10 +3,6 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print("device = " + str(device))
-torch.set_printoptions(sci_mode=False)
-
 class Generator(World):
     def __init__(self, sample_size: int, device: torch.device, steps = 5, dtype = torch.float32):
         super().__init__(sample_size*81, device, dtype)
@@ -22,14 +18,14 @@ class Generator(World):
         self.maxAgentSpeeds = torch.tensor([1,2,4,7],dtype=self.dtype).to(device)
         self.maxReaches = torch.tensor([2,5,10],dtype=self.dtype).to(device)
         self.maxBladeSpeeds = torch.tensor([2,5,10,20],dtype=self.dtype).to(device)
-
+    
+    def runif(self, n: int):
+        return torch.rand(n, device=self.device).unsqueeze(1)
+    
     def rdir(self, n: int):
         vectors = torch.randn(n, 2, device=self.device)
         dirs = F.normalize(vectors, p=2, dim=1)
         return dirs
-    
-    def runif(self, n: int):
-        return torch.rand(n, device=self.device).unsqueeze(1)
     
     def choose(self, source, n):
         return torch.multinomial(
@@ -75,10 +71,6 @@ class Generator(World):
             agent1.velocity,
             blade1.position,
             blade1.velocity
-        ], dim=1).reshape(-1,81*16)
+        ], dim=1).reshape(self.sample_size,81*16)
         data = torch.cat([start, outcomes],dim=1)
         return data
-
-generator = Generator(10000, device)
-data = generator.generate()
-print(data.shape)
