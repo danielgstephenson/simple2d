@@ -15,8 +15,8 @@ class ValueModel(torch.nn.Module):
         super().__init__(*args, **kwargs)
         self.activation = torch.nn.ReLU()
         inputSize = 16
-        k = 20
-        self.hiddenCount = 20
+        k = 50
+        self.hiddenCount = 10
         self.hiddenLayers = nn.ModuleList([nn.Linear(inputSize + i*k, k) for i in range(self.hiddenCount)])
         self.outputLayer = nn.Linear(inputSize + self.hiddenCount*k, 1)
     def forward(self, state: Tensor) -> Tensor:
@@ -81,7 +81,7 @@ learning_rate = 0.001
 for param_group in optimizer.param_groups:
     param_group['lr'] = learning_rate
 
-batch_size = 50
+batch_size = 20000
 generator = Generator(batch_size, device)
 
 discount = 0.95
@@ -107,6 +107,7 @@ for batch in range(1000000000):
     loss = F.mse_loss(output, target, reduction='mean')
     loss_value = loss.detach().cpu().numpy()
     loss.backward()
+    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
     save_checkpoint(model, optimizer, checkpoint_path)
     print(f'Batch: {batch}, Loss: {loss_value:05.2f}')
