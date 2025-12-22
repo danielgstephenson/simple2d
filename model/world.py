@@ -3,26 +3,6 @@ from math import cos, pi, sin
 import torch
 import torch.nn.functional as F
 
-# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# defaultType = torch.float64
-torch.set_printoptions(sci_mode=False)
-
-# actionVectorList = [[0.0,0.0]]
-# for i in range(8):
-#     angle = 2 * pi * i / 8
-#     dir = [cos(angle), sin(angle)]
-#     actionVectorList.append(dir)
-# actionVectors = torch.tensor(actionVectorList).to(device)
-# actions = torch.tensor([i for i in range(9)]).to(device)
-# actionIndexPairs = torch.cartesian_prod(actions,actions)
-# actionVectorPairs = torch.cat(
-#     [
-#         actionVectors[actionIndexPairs[:,0]],
-#         actionVectors[actionIndexPairs[:,1]]
-#     ],
-#     dim=1
-# )
-
 class Circle: 
     def __init__(self,world: World, radius: float):
         self.world = world

@@ -1,5 +1,6 @@
 from world import World, Agent
 import torch
+from torch import Tensor
 import torch.nn.functional as F
 import numpy as np
 
@@ -33,7 +34,7 @@ class Generator(World):
             num_samples=n, 
             replacement=True).unsqueeze(1)
     
-    def getAgentStart(self):
+    def get_agent_start(self):
         n = self.sample_size
         maxSpawnDistance = self.choose(self.maxSpawnDistances, n)
         maxAgentSpeed = self.choose(self.maxAgentSpeeds, n)
@@ -46,9 +47,16 @@ class Generator(World):
         start = torch.cat((agentPosition, agentVelocity, bladePosition, bladeVeclocity),dim=1)
         return start
     
-    def generate(self):
-        agentStarts = [self.getAgentStart() for i in range(2)]
-        start = torch.cat(agentStarts, dim=1)
+    def get_start(self):
+        start0 = self.get_agent_start()
+        start1 = self.get_agent_start()
+        return torch.cat([start0, start1], dim=1)
+
+    def get_outcomes(self, start: torch.Tensor):
+        agentStarts = [
+            start[:,0:8], 
+            start[:,8:16]
+        ]
         for i in range(2):
             agent = self.agents[i]
             agentState = agentStarts[i].repeat_interleave(81,dim=0)
@@ -72,5 +80,10 @@ class Generator(World):
             blade1.position,
             blade1.velocity
         ], dim=1).reshape(self.sample_size,81*16)
+        return outcomes
+    
+    def generate(self):
+        start = self.get_start()
+        outcomes = self.get_outcomes(start)
         data = torch.cat([start, outcomes],dim=1)
         return data

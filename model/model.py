@@ -81,9 +81,8 @@ learning_rate = 0.001
 for param_group in optimizer.param_groups:
     param_group['lr'] = learning_rate
 
-batch_size = 50000
+batch_size = 50
 generator = Generator(batch_size, device)
-
 
 discount = 0.95
 self_noise = 0.1
