@@ -64,25 +64,32 @@ def save_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: st
         print('Checkpoint saved.')
         raise
 
-def load_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: str):
-    if os.path.exists(path):
-        checkpoint = torch.load(path, weights_only=False)
-        model.load_state_dict(checkpoint['model_state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-
+step = 1
 model = ValueModel().to(device)
 old_model = get_reward
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
 
-checkpoint_path = './checkpoints/checkpoint0.pt'
-load_checkpoint(model, optimizer, checkpoint_path)
+checkpoint_path = f'./checkpoints/checkpoint{step}.pt'
+if os.path.exists(checkpoint_path):
+    checkpoint = torch.load(checkpoint_path, weights_only=False)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+if step > 0:
+    old_model = ValueModel().to(device)
+    old_checkpoint_path = f'./checkpoints/checkpoint{step-1}.pt'
+    checkpoint = torch.load(old_checkpoint_path, weights_only=False)
+    old_model.load_state_dict(checkpoint['model_state_dict'])
+    old_model.eval()
 
-learning_rate = 0.001
+learning_rate = 0.0001
 for param_group in optimizer.param_groups:
     param_group['lr'] = learning_rate
 
-batch_size = 20000
+batch_size = 2000
 generator = Generator(batch_size, device)
+
+smooth_loss = 0
+smoothing = 0.05
 
 discount = 0.95
 self_noise = 0.1
@@ -106,8 +113,9 @@ for batch in range(100000000000):
         target = (1-discount)*reward + discount*future_value
     loss = F.mse_loss(output, target, reduction='mean')
     loss_value = loss.detach().cpu().numpy()
+    smooth_loss = loss_value if batch == 0 else smoothing*loss_value + (1-smoothing)*smooth_loss
     loss.backward()
     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
     save_checkpoint(model, optimizer, checkpoint_path)
-    print(f'Batch: {batch}, Loss: {loss_value:05.2f}')
+    print(f'Batch: {batch}, Loss: {loss_value:05.2f}, Smooth: {smooth_loss:05.2f}')
