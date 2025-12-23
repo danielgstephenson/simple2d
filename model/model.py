@@ -13,9 +13,9 @@ torch.set_printoptions(sci_mode=False)
 class ValueModel(torch.nn.Module):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.activation = torch.nn.ReLU()
+        self.activation = torch.nn.LeakyReLU(negative_slope=0.01)
         inputSize = 16
-        k = 50
+        k = 100
         self.hiddenCount = 10
         self.hiddenLayers = nn.ModuleList([nn.Linear(inputSize + i*k, k) for i in range(self.hiddenCount)])
         self.outputLayer = nn.Linear(inputSize + self.hiddenCount*k, 1)
@@ -72,7 +72,7 @@ def load_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: st
 
 model = ValueModel().to(device)
 old_model = get_reward
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
 
 checkpoint_path = './checkpoints/checkpoint0.pt'
 load_checkpoint(model, optimizer, checkpoint_path)
@@ -88,14 +88,14 @@ discount = 0.95
 self_noise = 0.1
 other_noise = 0.01
 print('Training...')
-for batch in range(1000000000):
+for batch in range(100000000000):
     data = generator.generate()
     state = data[:,0:16]
     output = model(state)
     reward = get_reward(state)
-    futures = data[:,16:].reshape(-1,16)  
+    outcomes = data[:,16:].reshape(-1,16)  
     with torch.no_grad():        
-        future_values = old_model(futures)
+        future_values = old_model(outcomes)
         value_matrices = future_values.reshape(batch_size,9,9)
         means = torch.mean(value_matrices,2)
         mins = torch.amin(value_matrices,2)
