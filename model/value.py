@@ -64,58 +64,58 @@ def save_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: st
         print('Checkpoint saved.')
         raise
 
-step = 1
-model = ValueModel().to(device)
-old_model = get_reward
-optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
 
-checkpoint_path = f'./checkpoints/checkpoint{step}.pt'
+model = ValueModel().to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
+checkpoint_path = f'./checkpoints/checkpoint.pt'
 if os.path.exists(checkpoint_path):
     checkpoint = torch.load(checkpoint_path, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-if step > 0:
-    old_model = ValueModel().to(device)
-    old_checkpoint_path = f'./checkpoints/checkpoint{step-1}.pt'
-    checkpoint = torch.load(old_checkpoint_path, weights_only=False)
-    old_model.load_state_dict(checkpoint['model_state_dict'])
-    old_model.eval()
 
 learning_rate = 0.0001
 for param_group in optimizer.param_groups:
     param_group['lr'] = learning_rate
 
+advance = True
+old_model = get_reward
+if advance:
+    old_model = ValueModel().to(device)
+
 batch_size = 2000
 generator = Generator(batch_size, device)
 
 smooth_loss = 0
-smoothing = 0.05
-
+smoothing = 0.01
 discount = 0.95
 self_noise = 0.1
 other_noise = 0.01
 print('Training...')
-for batch in range(100000000000):
-    data = generator.generate()
-    state = data[:,0:16]
-    output = model(state)
-    reward = get_reward(state)
-    outcomes = data[:,16:].reshape(-1,16)  
-    with torch.no_grad():        
-        future_values = old_model(outcomes)
-        value_matrices = future_values.reshape(batch_size,9,9)
-        means = torch.mean(value_matrices,2)
-        mins = torch.amin(value_matrices,2)
-        action_values = other_noise*means + (1-other_noise)*mins
-        max_value = torch.amax(action_values,1).unsqueeze(1)
-        average_value = torch.mean(action_values,1).unsqueeze(1)
-        future_value = self_noise*average_value + (1-self_noise)*max_value
-        target = (1-discount)*reward + discount*future_value
-    loss = F.mse_loss(output, target, reduction='mean')
-    loss_value = loss.detach().cpu().numpy()
-    smooth_loss = loss_value if batch == 0 else smoothing*loss_value + (1-smoothing)*smooth_loss
-    loss.backward()
-    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-    optimizer.step()
+for epoch in range(100000000000):
     save_checkpoint(model, optimizer, checkpoint_path)
-    print(f'Batch: {batch}, Loss: {loss_value:05.2f}, Smooth: {smooth_loss:05.2f}')
+    if advance:
+        if isinstance(old_model, ValueModel):
+            old_model.load_state_dict(model.state_dict())
+    for batch in range(1000):
+        data = generator.generate()
+        state = data[:,0:16]
+        output = model(state)
+        reward = get_reward(state)
+        outcomes = data[:,16:].reshape(-1,16)  
+        with torch.no_grad():        
+            future_values = old_model(outcomes)
+            value_matrices = future_values.reshape(batch_size,9,9)
+            means = torch.mean(value_matrices,2)
+            mins = torch.amin(value_matrices,2)
+            action_values = other_noise*means + (1-other_noise)*mins
+            max_value = torch.amax(action_values,1).unsqueeze(1)
+            average_value = torch.mean(action_values,1).unsqueeze(1)
+            future_value = self_noise*average_value + (1-self_noise)*max_value
+            target = (1-discount)*reward + discount*future_value
+        loss = F.mse_loss(output, target, reduction='mean')
+        loss_value = loss.detach().cpu().numpy()
+        smooth_loss = loss_value if batch == 0 else smoothing*loss_value + (1-smoothing)*smooth_loss
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        optimizer.step()
+        print(f'Epoch: {epoch}, Batch: {batch}, Loss: {loss_value:05.2f}, Smooth: {smooth_loss:05.2f}')
