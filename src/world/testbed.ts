@@ -1,25 +1,33 @@
-import { range } from '../math'
+import { Brain } from '../brain'
+import { Agent } from '../entities/agent'
 import { World } from './world'
 
 export class Testbed extends World {
+  brain = new Brain()
+  player: Agent
+  bot: Agent
+
   constructor () {
     super()
-    const agent1 = this.addAgent([-3, 0])
-    const agent2 = this.addAgent([+3, 0])
-    agent1.velocity = [+1, 0]
-    agent2.velocity = [-1, 0]
-    agent1.blade.position = [-2, -4]
-    agent2.blade.position = [+2, +4]
-    agent1.blade.velocity = [+5, 0]
-    agent2.blade.velocity = [-5, 0]
+    this.player = this.addAgent([-3, 0])
+    this.bot = this.addAgent([+3, 0])
     this.summary = this.summarize()
+    this.begin()
+  }
 
-    range(50).forEach(step => {
-      console.log(step)
-      this.agents.forEach(agent => {
-        console.log(agent.position)
-      })
-      this.step()
-    })
+  postStep (): void {
+    this.summary = this.summarize()
+    const state = this.getState()
+    void this.brain.update(state)
+  }
+
+  preStep (): void {
+    this.bot.action = this.brain.action
+  }
+
+  getState (): number[] {
+    const playerState = this.player.getState()
+    const botState = this.bot.getState()
+    return [...botState, ...playerState]
   }
 }

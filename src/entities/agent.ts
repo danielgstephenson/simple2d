@@ -27,4 +27,19 @@ export class Agent extends Circle {
     this.velocity = [0, 0]
     this.blade.velocity = [0, 0]
   }
+
+  getState (): number[] {
+    const ap = this.position
+    const av = this.velocity
+    const bp = this.blade.position
+    const bv = this.blade.velocity
+    return [...ap, ...av, ...bp, ...bv]
+  }
+
+  setState (state: number[]): void {
+    this.position = [state[0], state[1]]
+    this.velocity = [state[2], state[3]]
+    this.blade.position = [state[4], state[5]]
+    this.blade.velocity = [state[6], state[7]]
+  }
 }

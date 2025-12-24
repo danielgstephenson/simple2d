@@ -14,11 +14,14 @@ export class World {
   arena: Arena
   summary: WorldSummary
   timeStep = 0.04
-  timeScale = 0.1
+  timeScale = 1
 
   constructor () {
     this.arena = new Arena(this)
     this.summary = this.summarize()
+  }
+
+  begin (): void {
     setInterval(() => this.step(), 1000 * this.timeStep / this.timeScale)
   }
 
@@ -40,7 +43,12 @@ export class World {
     }
   }
 
+  postStep (): void {}
+
+  preStep (): void {}
+
   step (): void {
+    this.preStep()
     const dt = this.timeStep
     const agentCount = this.agents.length
     range(agentCount).forEach(i => {
@@ -91,7 +99,7 @@ export class World {
     this.agents.forEach(agent => {
       if (agent.dead) agent.respawn()
     })
-    this.summary = this.summarize()
+    this.postStep()
   }
 
   collideCircleCircle (circle1: Circle, circle2: Circle): void {
