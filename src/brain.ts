@@ -57,11 +57,6 @@ export class Brain {
     const result = await this.session.run(feeds)
     if (!(result.output.data instanceof Float32Array)) return
     const modelValues = Array.from(result.output.data)
-    const values = outcomes.map(outcome => {
-      const position = [outcome[0], outcome[1]]
-      const distance = Math.sqrt(position[0] ** 2 + position[1] ** 2)
-      return -distance
-    })
     const valueMatrix: number[][] = []
     range(9).forEach(r => {
       valueMatrix[r] = range(9 * r, 9 * r + 8).map(i => modelValues[i])

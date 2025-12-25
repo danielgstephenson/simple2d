@@ -2,8 +2,7 @@ import torch
 from torch import Tensor, nn
 import torch.nn.functional as F
 from torch.export import Dim
-import contextlib
-import io
+import math
 
 def get_reward(state: Tensor)->Tensor:
     fighterPos0 = state[:,0:2]
@@ -19,51 +18,70 @@ def get_reward(state: Tensor)->Tensor:
     reward = -dist0 # + 0.2 * (danger1 - danger0)
     return reward.unsqueeze(1)
 
-class FourierFeatures(nn.Module):
-    def __init__(self, input_dim, half_output_dim, scale=1.0):
-        super(FourierFeatures, self).__init__()
-        self.input_dim = input_dim
-        self.half_output_size = half_output_dim
-        self.scale = scale
-        self.B = nn.Parameter(torch.randn(half_output_dim, input_dim) * self.scale, requires_grad=False)
-
-    def forward(self, x):
-        projection: Tensor = 2.0 * torch.pi * x @ self.B.T
-        return torch.cat([torch.sin(projection), torch.cos(projection)], dim=-1)
-
-class ValueModel(torch.nn.Module):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        inputSize = 16
-        k = 200
-        self.hiddenCount = 25
-        self.initLayer = nn.Linear(inputSize, k)
-        self.hiddenLayers = nn.ModuleList([nn.Linear(k, k) for i in range(self.hiddenCount)])
-        self.outputLayer = nn.Linear(k, 1)
-    def forward(self, x: Tensor) -> Tensor:
-        x = self.initLayer(x)
-        for i in range(self.hiddenCount):
-            h = self.hiddenLayers[i]
-            x = x + F.silu(h(x))
-        return self.outputLayer(x)
-    def __call__(self, *args, **kwds) -> Tensor:
-        return super().__call__(*args, **kwds)
-
 class DenseValueModel(torch.nn.Module):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         inputSize = 16
-        k = 20
-        self.hiddenCount = 20
+        k = 500
+        self.hiddenCount = 3
+        # self.activation = F.silu
+        self.activation = torch.sin
         self.hiddenLayers = nn.ModuleList([nn.Linear(inputSize + i*k, k) for i in range(self.hiddenCount)])
         self.outputLayer = nn.Linear(inputSize + self.hiddenCount*k, 1)
     def forward(self, x: Tensor) -> Tensor:
         for i in range(self.hiddenCount):
             h = self.hiddenLayers[i]
-            x = torch.cat([x, torch.sin(h(x))],dim=1)
+            x = torch.cat([x, self.activation(h(x))],dim=1)
         return self.outputLayer(x)
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
+    
+class Siren(nn.Module):
+    def __init__(self,in_features: int,out_features: int, w0=1.0, is_first=False, sin=True):
+        super().__init__()
+        self.in_features = in_features
+        self.is_first = is_first
+        self.w0 = w0
+        self.linear = nn.Linear(in_features, out_features)
+        self.activation = torch.sin if sin else torch.nn.Identity()
+        self.init_weights()
+    def init_weights(self):
+        with torch.no_grad():
+            if self.is_first:
+                self.linear.weight.uniform_(
+                    -1 / self.in_features,
+                     1 / self.in_features
+                )
+            else:
+                bound = math.sqrt(6 / self.in_features) / self.w0
+                self.linear.weight.uniform_(-bound, bound)
+    def forward(self, x):
+        return self.activation(self.linear(x))
+    def __call__(self, *args, **kwds) -> Tensor:
+        return super().__call__(*args, **kwds)
+
+    
+class ValueModel(torch.nn.Module):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        input_dim = 16
+        k = 500
+        w0_first = 30.0
+        w0_hidden = 1.0
+        self.hidden_count = 2
+        self.first_layer = Siren(input_dim,k,w0=w0_first)
+        self.hidden_layers = nn.ModuleList([Siren(k,k,w0=w0_hidden) for i in range(self.hidden_count)])
+        self.output_layer = Siren(k,1,w0=w0_hidden,sin=False)
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.first_layer(x)
+        for i in range(self.hidden_count):
+            h = self.hidden_layers[i]
+            x = h(x)
+        return self.output_layer(x)
+    def __call__(self, *args, **kwds) -> Tensor:
+        return super().__call__(*args, **kwds)
+    
+#  SIN: Batch: 25834, LR: 0.00010000, Loss: 00.1379, Smooth: 00.1268, Delta: 00.00
 
 class ActionModel(torch.nn.Module):
     def __init__(self, *args, **kwargs):
@@ -98,16 +116,17 @@ def save_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: st
         raise
 
 def save_onnx(model: nn.Module, path: str, device: torch.device):
-    with contextlib.redirect_stdout(io.StringIO()):
-        example_input = torch.tensor([[i for i in range(16)]],dtype=torch.float32).to(device)
-        example_input_tuple = (example_input,)
-        onnx_program = torch.onnx.export(
-            model, 
-            example_input_tuple, 
-            dynamo=True,
-            input_names=["state"],
-            output_names=["output"],
-            dynamic_shapes=[[Dim("batch_size"), Dim.AUTO]]
-        )
-        if onnx_program is not None:
-            onnx_program.save(path)
+    # with contextlib.redirect_stdout(io.StringIO()):
+    example_input = torch.tensor([[i for i in range(16)]],dtype=torch.float32).to(device)
+    example_input_tuple = (example_input,)
+    onnx_program = torch.onnx.export(
+        model, 
+        example_input_tuple, 
+        dynamo=True,
+        input_names=["state"],
+        output_names=["output"],
+        dynamic_shapes=[[Dim("batch_size"), Dim.AUTO]],
+        verbose=False
+    )
+    if onnx_program is not None:
+        onnx_program.save(path)
