@@ -33,10 +33,8 @@ class Generator(World):
         return dirs
     
     def choose(self, source, n):
-        return torch.multinomial(
-            input=source, 
-            num_samples=n, 
-            replacement=True).unsqueeze(1)
+        indices = torch.multinomial(input=source, num_samples=n, replacement=True).unsqueeze(1)
+        return source[indices]
     
     def get_agent_start(self):
         n = self.sample_size
