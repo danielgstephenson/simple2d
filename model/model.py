@@ -17,33 +17,15 @@ def get_reward(state: Tensor)->Tensor:
     # danger1 = torch.sqrt(torch.sum((fighterPos1-weaponPos0)**2,dim=1))
     reward = -dist0 # + 0.2 * (danger1 - danger0)
     return reward.unsqueeze(1)
-
-class DenseValueModel(torch.nn.Module):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        inputSize = 16
-        k = 500
-        self.hiddenCount = 3
-        # self.activation = F.silu
-        self.activation = torch.sin
-        self.hiddenLayers = nn.ModuleList([nn.Linear(inputSize + i*k, k) for i in range(self.hiddenCount)])
-        self.outputLayer = nn.Linear(inputSize + self.hiddenCount*k, 1)
-    def forward(self, x: Tensor) -> Tensor:
-        for i in range(self.hiddenCount):
-            h = self.hiddenLayers[i]
-            x = torch.cat([x, self.activation(h(x))],dim=1)
-        return self.outputLayer(x)
-    def __call__(self, *args, **kwds) -> Tensor:
-        return super().__call__(*args, **kwds)
     
 class Siren(nn.Module):
-    def __init__(self,in_features: int,out_features: int, w0=1.0, is_first=False, sin=True):
+    def __init__(self,in_features: int,out_features: int, w0=1.0, is_first=False, linear=False):
         super().__init__()
         self.in_features = in_features
         self.is_first = is_first
         self.w0 = w0
         self.linear = nn.Linear(in_features, out_features)
-        self.activation = torch.sin if sin else torch.nn.Identity()
+        self.activation = torch.nn.Identity() if linear else torch.sin
         self.init_weights()
     def init_weights(self):
         with torch.no_grad():
@@ -60,7 +42,6 @@ class Siren(nn.Module):
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
 
-    
 class ValueModel(torch.nn.Module):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,19 +49,24 @@ class ValueModel(torch.nn.Module):
         k = 500
         w0_first = 30.0
         w0_hidden = 1.0
-        self.hidden_count = 2
-        self.first_layer = Siren(input_dim,k,w0=w0_first)
-        self.hidden_layers = nn.ModuleList([Siren(k,k,w0=w0_hidden) for i in range(self.hidden_count)])
-        self.output_layer = Siren(k,1,w0=w0_hidden,sin=False)
+        self.layer_count = 4
+        self.layers = []
+        init_layer = Siren(input_dim, k, w0=w0_first)
+        self.layers.append(init_layer)
+        for i in range(self.layer_count-2):
+            hidden_layer = Siren(k, k, w0=w0_hidden)
+            self.layers.append(hidden_layer)
+        final_layer = Siren(k, 1, w0=w0_hidden, linear=True)
+        self.layers.append(final_layer)
+        self.net = nn.Sequential(*self.layers)
     def forward(self, x: Tensor) -> Tensor:
-        x = self.first_layer(x)
-        for i in range(self.hidden_count):
-            h = self.hidden_layers[i]
-            x = h(x)
-        return self.output_layer(x)
+        # for i in range(self.layer_count):
+        #     h = self.layers[i]
+        #     x = h(x)
+        return self.net(x)
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
-    
+
 #  SIN: Batch: 25834, LR: 0.00010000, Loss: 00.1379, Smooth: 00.1268, Delta: 00.00
 
 class ActionModel(torch.nn.Module):

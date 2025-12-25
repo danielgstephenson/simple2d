@@ -28,8 +28,8 @@ target_model = ValueModel().to(device).eval() if advance else get_reward
 if isinstance(target_model, ValueModel):
     target_model.load_state_dict(model.state_dict())
 
-# print('Saving onnx...')
-# save_onnx(model, './onnx/value.onnx', device)
+print('Saving onnx...')
+save_onnx(model, './onnx/value.onnx', device)
 
 batch_size = 20000
 generator = Generator(batch_size, device)
