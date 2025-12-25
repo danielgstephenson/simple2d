@@ -28,24 +28,23 @@ target_model = ValueModel().to(device).eval() if advance else get_reward
 if isinstance(target_model, ValueModel):
     target_model.load_state_dict(model.state_dict())
 
-# print('Saving onnx...')
-# save_onnx(model, './onnx/value.onnx', device)
+print('Saving onnx...')
+save_onnx(model, './onnx/value.onnx', device)
 
-batch_size = 5
-print('start:')
+batch_size = 20000
 generator = Generator(batch_size, device)
 
-start = generator.get_start()
-testData = torch.tensor([[
-    -1.5383503606070938, 1.6556488490003125,
-    -1.2060559371513624, 0.5890940403668103,
-    -1.4174889692338488, 2.4769011919216943,
-    -3.1537424456779806, 0.9168236340224539,
-    -2.690579221153769, 0,
-    1.349066778281722, 0,
-    -2.9942584965125607, 0,
-    0.04695504633279549, 0
-]],dtype=torch.float32).to(device)
+# start = generator.get_start()
+# testData = torch.tensor([[
+#     -1.5383503606070938, 1.6556488490003125,
+#     -1.2060559371513624, 0.5890940403668103,
+#     -1.4174889692338488, 2.4769011919216943,
+#     -3.1537424456779806, 0.9168236340224539,
+#     -2.690579221153769, 0,
+#     1.349066778281722, 0,
+#     -2.9942584965125607, 0,
+#     0.04695504633279549, 0
+# ]],dtype=torch.float32).to(device)
 # print('start.shape', start.shape)
 # print('testData.shape', testData.shape)
 # testData = torch.cat([testData, start], dim=0)
@@ -58,7 +57,7 @@ testData = torch.tensor([[
 # print('results:')
 # print(results)
 
-quit()
+# quit()
 
 discount = 0.1
 self_noise = 1.0
