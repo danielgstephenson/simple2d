@@ -36,8 +36,9 @@ class Blade(Circle):
         self.world.blades.append(self)
 
 class World:
-    def __init__(self, count: int, device: torch.device, dtype = torch.float64):
-        self.timeStep = 0.04
+    def __init__(self, count: int, device: torch.device, dtype = torch.float64, timeStep=0.04, deathPush=30):
+        self.timeStep = timeStep
+        self.deathPush = deathPush
         self.circles: list[Circle] = []
         self.agents: list[Agent] = []
         self.blades: list[Blade] = []
@@ -109,7 +110,7 @@ class World:
         for agent in self.agents:
             direction = F.normalize(agent.position, dim=1)
             dead = (agent.dead > 0).unsqueeze(1)
-            agent.position = torch.where(dead, agent.position + 15 * direction, agent.position)
+            agent.position = torch.where(dead, agent.position + self.deathPush * direction, agent.position)
             agent.blade.position = torch.where(dead, agent.position.clone(), agent.blade.position)
             agent.velocity =  torch.where(dead, 0*agent.velocity, agent.velocity)
             agent.blade.velocity = torch.where(dead, 0*agent.blade.velocity, agent.blade.velocity)

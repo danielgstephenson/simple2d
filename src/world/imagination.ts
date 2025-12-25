@@ -5,7 +5,7 @@ import { World } from './world'
 export class Imagination extends World {
   agent0: Agent
   agent1: Agent
-  stepCount = 5
+  stepCount = 10
 
   constructor () {
     super()

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import numpy as np
 
 class Generator(World):
-    def __init__(self, sample_size: int, device: torch.device, steps = 5, dtype = torch.float32):
+    def __init__(self, sample_size: int, device: torch.device, steps = 1, dtype = torch.float32):
         super().__init__(sample_size*81, device, dtype)
         self.sample_size = sample_size
         self.steps = steps
@@ -15,10 +15,14 @@ class Generator(World):
         actionMatrix = actionPairs.repeat(self.sample_size,1)
         agent0.action = actionMatrix[:,0]
         agent1.action = actionMatrix[:,1]
-        self.maxSpawnDistances = torch.tensor([5,10,15,20,30,50],dtype=self.dtype).to(device)
-        self.maxAgentSpeeds = torch.tensor([1,2,4,7],dtype=self.dtype).to(device)
-        self.maxReaches = torch.tensor([2,5,10],dtype=self.dtype).to(device)
-        self.maxBladeSpeeds = torch.tensor([2,5,10,20],dtype=self.dtype).to(device)
+        # self.maxSpawnDistances = torch.tensor([5,10,15,20,30,50],dtype=self.dtype).to(device)
+        # self.maxAgentSpeeds = torch.tensor([1,2,4,7],dtype=self.dtype).to(device)
+        # self.maxReaches = torch.tensor([2,5,10],dtype=self.dtype).to(device)
+        # self.maxBladeSpeeds = torch.tensor([2,5,10,20],dtype=self.dtype).to(device)
+        self.maxSpawnDistances = torch.tensor([50],dtype=self.dtype).to(device)
+        self.maxAgentSpeeds = torch.tensor([7],dtype=self.dtype).to(device)
+        self.maxReaches = torch.tensor([10],dtype=self.dtype).to(device)
+        self.maxBladeSpeeds = torch.tensor([20],dtype=self.dtype).to(device)
     
     def runif(self, n: int):
         return torch.rand(n, device=self.device).unsqueeze(1)

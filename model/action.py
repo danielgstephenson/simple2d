@@ -1,5 +1,5 @@
 from generator import Generator
-from model import ValueModel, ActionModel, save_checkpoint, save_onnx, discount, other_noise
+from model import ValueModel, ActionModel, save_checkpoint, save_onnx
 import torch
 import torch.nn.functional as F
 import os
@@ -31,6 +31,9 @@ for param_group in optimizer.param_groups:
 batch_size = 2000
 generator = Generator(batch_size, device)
 
+discount = 0.1
+self_noise = 1.0
+other_noise = 1.0
 smooth_loss = 0
 loss_smoothing = 0.01
 print('Training...')

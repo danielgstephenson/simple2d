@@ -20,6 +20,11 @@ export function sum (array: number[]): number {
   return total
 }
 
+export function mean (array: number[]): number {
+  if (array.length === 0) return 0
+  return sum(array) / array.length
+}
+
 export function average (array: number[]): number {
   if (array.length === 0) return 0
   return sum(array) / array.length
