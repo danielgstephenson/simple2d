@@ -31,7 +31,7 @@ if isinstance(target_model, ValueModel):
 print('Saving onnx...')
 save_onnx(model, './onnx/value.onnx', device)
 
-batch_size = 20000
+batch_size = 50000
 generator = Generator(batch_size, device)
 
 # quit()

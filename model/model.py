@@ -49,7 +49,7 @@ class ValueModel(torch.nn.Module):
         k = 500
         w0_first = 30.0
         w0_hidden = 1.0
-        self.layer_count = 4
+        self.layer_count = 3
         self.layers = []
         init_layer = Siren(input_dim, k, w0=w0_first)
         self.layers.append(init_layer)
@@ -60,9 +60,6 @@ class ValueModel(torch.nn.Module):
         self.layers.append(final_layer)
         self.net = nn.Sequential(*self.layers)
     def forward(self, x: Tensor) -> Tensor:
-        # for i in range(self.layer_count):
-        #     h = self.layers[i]
-        #     x = h(x)
         return self.net(x)
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
