@@ -6,16 +6,16 @@ import math
 
 def get_reward(state: Tensor)->Tensor:
     fighterPos0 = state[:,0:2]
-    # fighterPos1 = state[:,8:10]
+    fighterPos1 = state[:,8:10]
     dist0 = torch.sqrt(torch.sum(fighterPos0**2,dim=1))
-    # dist1 = torch.sqrt(torch.sum(fighterPos1**2,dim=1))
-    # dist0 = torch.maximum(dist0,torch.tensor(5))
+    dist1 = torch.sqrt(torch.sum(fighterPos1**2,dim=1))
+    dist0 = torch.maximum(dist0,torch.tensor(5))
     # dist1 = torch.maximum(dist1,torch.tensor(5))
     # weaponPos0 = state[:,4:6]
     # weaponPos1 = state[:,12:14]
     # danger0 = torch.sqrt(torch.sum((fighterPos0-weaponPos1)**2,dim=1))
     # danger1 = torch.sqrt(torch.sum((fighterPos1-weaponPos0)**2,dim=1))
-    reward = -dist0 # + 0.2 * (danger1 - danger0)
+    reward = dist1 - dist0 # + 0.2 * (danger1 - danger0)
     return reward.unsqueeze(1)
     
 class Siren(nn.Module):
@@ -101,10 +101,11 @@ class ActionModel(torch.nn.Module):
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
 
-def save_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, path: str):
+def save_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, discount: float, path: str):
     checkpoint = { 
         'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict()
+        'optimizer_state_dict': optimizer.state_dict(),
+        'discount': discount
     }
     try:
         torch.save(checkpoint, path)
