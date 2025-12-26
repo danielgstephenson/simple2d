@@ -41,30 +41,46 @@ class Siren(nn.Module):
         return self.activation(self.linear(x))
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
+    
+class SineLinear(nn.Module):
+    def __init__(self,in_features: int, out_features: int, w0=1.0):
+        super().__init__()
+        self.in_features = in_features
+        self.w0 = w0
+        self.linear = nn.Linear(in_features, out_features)
+    def forward(self, x):
+        return torch.sin(self.w0*self.linear(x))
+    def __call__(self, *args, **kwds) -> Tensor:
+        return super().__call__(*args, **kwds)
 
 class ValueModel(torch.nn.Module):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         input_dim = 16
         k = 500
-        w0_first = 30.0
-        w0_hidden = 1.0
-        self.layer_count = 3
-        self.layers = []
-        init_layer = Siren(input_dim, k, w0=w0_first)
-        self.layers.append(init_layer)
-        for i in range(self.layer_count-2):
-            hidden_layer = Siren(k, k, w0=w0_hidden)
-            self.layers.append(hidden_layer)
-        final_layer = Siren(k, 1, w0=w0_hidden, linear=True)
-        self.layers.append(final_layer)
-        self.net = nn.Sequential(*self.layers)
+        self.w0 = 0.1
+        self.hidden_count = 4
+        self.init_layer = nn.Linear(input_dim, k)
+        self.hidden_layers = nn.ModuleList()
+        for i in range(self.hidden_count):
+            self.hidden_layers.append(nn.Linear(k, k))
+        self.final_layer = nn.Linear(k, 1)
     def forward(self, x: Tensor) -> Tensor:
-        return self.net(x)
+        # x = torch.sin(self.w0 * self.init_layer(x))
+        x = self.init_layer(x)
+        for i in range(self.hidden_count):
+            h = self.hidden_layers[i]
+            x = x + F.silu(h(x))
+        x = self.final_layer(x)
+        return x
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
 
-#  SIN: Batch: 25834, LR: 0.00010000, Loss: 00.1379, Smooth: 00.1268, Delta: 00.00
+# k=100, layer_count = 10, w0_first = 1, w0_hidden = 1
+# Batch: 4992, LR: 0.00100000, Loss: 01.6439, Smooth: 02.0420, Delta: 00.00
+
+# k=100, layer_count = 10, w0_first = 30, w0_hidden = 1
+# Batch: 2616, LR: 0.00100000, Loss: 207.7644, Smooth: 208.2633, Delta: 00.00
 
 class ActionModel(torch.nn.Module):
     def __init__(self, *args, **kwargs):

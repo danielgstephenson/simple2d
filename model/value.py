@@ -12,14 +12,13 @@ torch.set_printoptions(sci_mode=False)
 
 model = ValueModel().to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
-scheduler = ReduceLROnPlateau(optimizer, factor=0.1, patience=100, cooldown=100)
 checkpoint_path = f'./checkpoints/value_checkpoint.pt'
 if os.path.exists(checkpoint_path):
     checkpoint = torch.load(checkpoint_path, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-lr = 0.0001
+lr = 0.00001
 for param_group in optimizer.param_groups:
     param_group['lr'] = lr
 
@@ -31,7 +30,7 @@ if isinstance(target_model, ValueModel):
 print('Saving onnx...')
 save_onnx(model, './onnx/value.onnx', device)
 
-batch_size = 50000
+batch_size = 30000
 generator = Generator(batch_size, device)
 
 # quit()
@@ -40,7 +39,7 @@ discount = 0.9
 self_noise = 0.5
 other_noise = 0
 smooth_loss = 0
-loss_smoothing = 0.01
+loss_smoothing = 0.05
 target_smoothing = 0.001
 print('Training...')
 for batch in range(1000000000000):
@@ -66,8 +65,6 @@ for batch in range(1000000000000):
     loss.backward()
     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
-    # scheduler.step(smooth_loss)
-    # lr = scheduler.get_last_lr()[0]
     save_checkpoint(model, optimizer, checkpoint_path)
     delta = torch.tensor(0.0).to(device)
     if isinstance(target_model, ValueModel):
