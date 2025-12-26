@@ -14,7 +14,7 @@ export class Brain {
   }
 
   async startSession (): Promise<void> {
-    this.session = await ort.InferenceSession.create('./model/onnx/value.onnx')
+    this.session = await ort.InferenceSession.create('./model/onnx/value0.onnx')
     const state0 = [-3, 0, 0, 0, -3, 0, 0, 0]
     const state1 = [+3, 0, 0, 0, +3, 0, 0, 0]
     const state = [...state0, ...state1]
