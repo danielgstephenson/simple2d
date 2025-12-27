@@ -1,21 +1,44 @@
-from numpy import dtype
 from generator import Generator
-from model import ValueModel, get_reward, save_checkpoint, save_onnx
+from reward import get_reward
+from save import save_checkpoint, save_onnx
 import torch
 import torch.nn.functional as F
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch import Tensor, nn
 import os
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("device = " + str(device))
 torch.set_printoptions(sci_mode=False)
 
+class ValueModel(torch.nn.Module):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        input_dim = 16
+        k = 500
+        self.w0 = 0.1
+        self.hidden_count = 4
+        self.init_layer = nn.Linear(input_dim, k)
+        self.hidden_layers = nn.ModuleList()
+        for i in range(self.hidden_count):
+            self.hidden_layers.append(nn.Linear(k, k))
+        self.final_layer = nn.Linear(k, 1)
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.init_layer(x)
+        for i in range(self.hidden_count):
+            h = self.hidden_layers[i]
+            x = x + F.silu(h(x))
+        x = self.final_layer(x)
+        return x
+    def __call__(self, *args, **kwds) -> Tensor:
+        return super().__call__(*args, **kwds)
+
+
 checkpoint_path = './checkpoints/value_checkpoint.pt'
 onnx_path = './onnx/value.onnx'
 model = ValueModel().to(device)
 target_model = ValueModel().to(device).eval()
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
-discount = 0.1
+discount = 0
 if os.path.exists(checkpoint_path):
     checkpoint = torch.load(checkpoint_path, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
@@ -71,14 +94,13 @@ for batch in range(1000000000000):
     save_checkpoint(model, optimizer, discount, checkpoint_path)
     delta = torch.tensor(0.0).to(device)
     if isinstance(target_model, ValueModel) and batch > 100:
-        if loss_value < 0.1:
-            discount = min(0.99, discount + 0.001)
+        if loss_value < 0.06:
+            discount = min(0.99, discount + 0.0001)
             with torch.no_grad():
                 for target_param, param in zip(target_model.parameters(), model.parameters()):
                     new_target_param = param.data
                     delta += torch.sum((new_target_param-target_param.data)**2)
                     target_param.data.copy_(new_target_param)
         else:
-            discount = max(0.0, discount - 0.001)
-    delta = 100*torch.sqrt(delta)
-    print(f'Batch: {batch}, LR: {lr:.8f}, Discount: {discount:.3f}, Loss: {loss_value:07.4f}, Smooth: {smooth_loss:07.4f}, Delta: {delta:010.08f}')
+            discount = max(0.0, discount - 0.0001)
+    print(f'Batch: {batch}, Discount: {discount:.4f}, Loss: {loss_value:07.4f}, Smooth: {smooth_loss:07.4f}')
