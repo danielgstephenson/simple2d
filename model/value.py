@@ -54,7 +54,7 @@ if os.path.exists(checkpoint_path):
 if isinstance(target_model, ValueModel):
     target_model.load_state_dict(model.state_dict())
 
-lr = 0.001
+lr = 0.0001
 for param_group in optimizer.param_groups:
     param_group['lr'] = lr
 
@@ -70,6 +70,7 @@ self_noise = 0.3
 other_noise = 0.1
 smooth_loss = 0
 loss_smoothing = 0.01
+loss_threshold = 0.3
 print('Training...')
 for batch in range(1000000000000):
     data = generator.generate()
@@ -92,18 +93,20 @@ for batch in range(1000000000000):
     target = (1-discount)*reward + discount*future_value
     loss = F.mse_loss(output, target, reduction='mean')
     loss_value = loss.detach().cpu().numpy()
-    smooth_loss = loss_value if batch == 0 else loss_smoothing*loss_value + (1-loss_smoothing)*smooth_loss
+    smooth_loss = loss_smoothing*loss_value + (1-loss_smoothing)*smooth_loss
+    if batch == 0: smooth_loss = 2 * loss_value
     loss.backward()
     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
     optimizer.zero_grad()
     save_checkpoint(model, target_model, optimizer, discount, horizon, checkpoint_path)
-    if batch > 100 and loss_value < 0.3:
-        horizon += 1
-        with torch.no_grad():
-            for target_param, param in zip(target_model.parameters(), model.parameters()):
-                new_target_param = param.data
-                target_param.data.copy_(new_target_param)
+    if isinstance(target_model, ValueModel) and batch > 100:
+        if loss_value < loss_threshold and smooth_loss < loss_threshold:
+            horizon += 1
+            with torch.no_grad():
+                for target_param, param in zip(target_model.parameters(), model.parameters()):
+                    new_target_param = param.data
+                    target_param.data.copy_(new_target_param)
     message = ''
     message += f'Batch: {batch}, '
     message += f'Discount: {discount:.4f}, '
