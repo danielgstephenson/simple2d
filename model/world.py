@@ -21,7 +21,7 @@ class Agent(Circle):
     def __init__(self, world: World):
         super().__init__(world, 0.5)
         self.blade = Blade(self)
-        self.movePower = 3
+        self.movePower = 3.0
         self.drag = 0.7
         self.dead = torch.zeros(world.count, dtype=torch.int).to(world.device)
         self.action = torch.zeros(world.count, dtype=torch.int).to(world.device)

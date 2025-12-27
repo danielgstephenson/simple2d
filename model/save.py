@@ -2,11 +2,20 @@ import torch
 from torch import nn
 from torch.export import Dim
 
-def save_checkpoint(model: nn.Module, optimizer: torch.optim.Optimizer, discount: float, path: str):
+def save_checkpoint(
+        model: nn.Module,
+        target_model: nn.Module,
+        optimizer: torch.optim.Optimizer,
+        discount: float, 
+        horizon: float, 
+        path: str
+    ):
     checkpoint = { 
         'model_state_dict': model.state_dict(),
+        'target_state_dict': target_model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'discount': discount
+        'discount': discount,
+        'horizon': horizon
     }
     try:
         torch.save(checkpoint, path)

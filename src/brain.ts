@@ -46,6 +46,13 @@ export class Brain {
     }
   }
 
+  getReward (state: number[]): number {
+    const agentPos0 = [state[0], state[1]]
+    const agentDist0 = Math.sqrt(agentPos0[0] ** 2 + agentPos0[1] ** 2)
+    const reward = -agentDist0
+    return reward
+  }
+
   async update (state: number[]): Promise<void> {
     if (this.busy) return
     if (this.session == null) return
@@ -57,6 +64,7 @@ export class Brain {
     const result = await this.session.run(feeds)
     if (!(result.output.data instanceof Float32Array)) return
     const modelValues = Array.from(result.output.data)
+    // const modelValues = outcomes.map(outcome => this.getReward(outcome))
     const valueMatrix: number[][] = []
     range(9).forEach(r => {
       valueMatrix[r] = range(9 * r, 9 * r + 8).map(i => modelValues[i])

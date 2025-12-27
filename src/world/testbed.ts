@@ -6,7 +6,7 @@ export class Testbed extends World {
   brain = new Brain()
   player: Agent
   bot: Agent
-  timeScale = 1.4
+  timeScale = 0.7
   timeStep = 0.02
 
   constructor () {
