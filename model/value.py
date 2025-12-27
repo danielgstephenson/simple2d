@@ -55,7 +55,7 @@ for param_group in optimizer.param_groups:
 print('Saving onnx...')
 save_onnx(model, onnx_path, device)
 
-batch_size = 3000 # Use 3000 on the local machine because of GPU memory limits
+batch_size = 3000
 generator = Generator(batch_size, device, steps=5)
 
 # quit()
@@ -92,15 +92,13 @@ for batch in range(1000000000000):
     optimizer.step()
     optimizer.zero_grad()
     save_checkpoint(model, optimizer, discount, checkpoint_path)
-    delta = torch.tensor(0.0).to(device)
     if isinstance(target_model, ValueModel) and batch > 100:
-        if loss_value < 0.06:
+        if loss_value < 0.01:
             discount = min(0.99, discount + 0.0001)
             with torch.no_grad():
                 for target_param, param in zip(target_model.parameters(), model.parameters()):
                     new_target_param = param.data
-                    delta += torch.sum((new_target_param-target_param.data)**2)
                     target_param.data.copy_(new_target_param)
         else:
             discount = max(0.0, discount - 0.0001)
-    print(f'Batch: {batch}, Discount: {discount:.4f}, Loss: {loss_value:07.4f}, Smooth: {smooth_loss:07.4f}')
+    print(f'Batch: {batch}, Discount: {discount:.3f}, Loss: {loss_value:07.4f}, Smooth: {smooth_loss:07.4f}')
