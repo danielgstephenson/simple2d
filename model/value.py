@@ -29,8 +29,8 @@ class ValueModel(torch.nn.Module):
         x = self.init_layer(x)
         for i in range(self.hidden_count):
             h = self.hidden_layers[i]
-            x = x + F.silu(h(x))
-            # x = x + torch.sin(h(x))
+            x = + F.silu(h(x))
+            # x = #  + torch.sin(h(# ))
             # x = torch.sin(h(x))
             # x = x + F.leaky_relu(h(x),negative_slope=0.01)
         x = self.final_layer(x)
@@ -65,7 +65,7 @@ for param_group in optimizer.param_groups:
 print('Saving onnx...')
 save_onnx(model, onnx_path, device)
 
-batch_size = 3000
+batch_size = 3000 # Reduce to 3000 if the horizon can exceed zero or GPU memory is limited
 generator = Generator(batch_size, device, steps=5)
 
 # quit()
@@ -73,8 +73,8 @@ generator = Generator(batch_size, device, steps=5)
 self_noise = 0.1 # 0.2 or 0.3 ?
 other_noise = 0.01
 smooth_loss = 0
-loss_smoothing = 0.01
-loss_threshold = 0.00001
+loss_smoothing = 0.05
+loss_threshold = -1 # The horizon never exceeds zero if this is negative
 print('Training...')
 for batch in range(1000000000000):
     data = generator.generate()
@@ -85,7 +85,7 @@ for batch in range(1000000000000):
     outcome_quality = get_quality(outcome)
     reward = outcome_quality - current_quality
     if horizon == 0:
-        outcome_value = get_quality(outcome)
+        outcome_value = reward
     else:
         with torch.no_grad(): outcome_value = target_model(outcome)   
     opponent_options = (1-discount)*reward + discount*outcome_value
