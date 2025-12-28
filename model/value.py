@@ -73,29 +73,27 @@ generator = Generator(batch_size, device, steps=5)
 self_noise = 0.1 # 0.2 or 0.3 ?
 other_noise = 0.01
 smooth_loss = 0
-loss_smoothing = 0.05
+loss_smoothing = 0.01
 loss_threshold = -1 # The horizon never exceeds zero if this is negative
 print('Training...')
 for batch in range(1000000000000):
     data = generator.generate()
     old_state = data[:,0:16]
     output = model(old_state)
-    current_quality = get_quality(old_state).repeat_interleave(81,dim=0)
-    outcome = data[:,16:].reshape(batch_size*81,16)
-    outcome_quality = get_quality(outcome)
-    reward = outcome_quality - current_quality
-    if horizon == 0:
-        outcome_value = reward
-    else:
-        with torch.no_grad(): outcome_value = target_model(outcome)   
-    opponent_options = (1-discount)*reward + discount*outcome_value
-    option_matrix = opponent_options.reshape(batch_size,9,9)
-    rowMeans = torch.mean(option_matrix,2)
-    rowMins = torch.amin(option_matrix,2)
-    action_values = other_noise*rowMeans + (1-other_noise)*rowMins
-    max_action_value = torch.amax(action_values,1).unsqueeze(1)
-    average_action_value = torch.mean(action_values,1).unsqueeze(1)
-    target = self_noise*average_action_value + (1-self_noise)*max_action_value
+    with torch.no_grad(): 
+        current_quality = get_quality(old_state).repeat_interleave(81,dim=0)
+        outcome = data[:,16:].reshape(batch_size*81,16)
+        outcome_quality = get_quality(outcome)
+        reward = outcome_quality - current_quality
+        outcome_value = reward if horizon == 0 else target_model(outcome)
+        opponent_options = (1-discount)*reward + discount*outcome_value
+        option_matrix = opponent_options.reshape(batch_size,9,9)
+        rowMeans = torch.mean(option_matrix,2)
+        rowMins = torch.amin(option_matrix,2)
+        action_values = other_noise*rowMeans + (1-other_noise)*rowMins
+        max_action_value = torch.amax(action_values,1).unsqueeze(1)
+        average_action_value = torch.mean(action_values,1).unsqueeze(1)
+        target = self_noise*average_action_value + (1-self_noise)*max_action_value
     loss = F.mse_loss(output, target, reduction='mean')
     loss_value = loss.detach().cpu().numpy()
     smooth_loss = loss_smoothing*loss_value + (1-loss_smoothing)*smooth_loss
