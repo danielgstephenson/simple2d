@@ -1,10 +1,11 @@
 from generator import Generator
-from reward import get_reward
+from reward import get_objective
 from save import save_checkpoint, save_onnx
 import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 import os
+import numpy as np
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("device = " + str(device))
@@ -35,13 +36,12 @@ class ValueModel(torch.nn.Module):
     def __call__(self, *args, **kwds) -> Tensor:
         return super().__call__(*args, **kwds)
 
-
 checkpoint_path = './checkpoints/value_checkpoint.pt'
 onnx_path = './onnx/value.onnx'
 model = ValueModel().to(device)
 target_model = ValueModel().to(device).eval()
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
-discount = 0.8
+discount = 0.9
 horizon = 0
 if os.path.exists(checkpoint_path):
     checkpoint = torch.load(checkpoint_path, weights_only=False)
@@ -50,6 +50,8 @@ if os.path.exists(checkpoint_path):
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     discount = checkpoint['discount']
     horizon = checkpoint['horizon']
+# horizon = 0
+# discount = 0.98
 
 if isinstance(target_model, ValueModel):
     target_model.load_state_dict(model.state_dict())
@@ -66,23 +68,22 @@ generator = Generator(batch_size, device, steps=5)
 
 # quit()
 
-self_noise = 0.3
-other_noise = 0.1
+self_noise = 0.1 # 0.2 or 0.3 ?
+other_noise = 0.01
 smooth_loss = 0
 loss_smoothing = 0.01
-loss_threshold = 0.3
+loss_threshold = 0.01
 print('Training...')
 for batch in range(1000000000000):
     data = generator.generate()
     state = data[:,0:16]
     output = model(state)
-    reward = get_reward(state)
+    reward = get_objective(state)
     outcomes = data[:,16:].reshape(-1,16)
     if horizon == 0:
-        future_values = get_reward(outcomes)
+        future_values = get_objective(outcomes)
     else:
-        with torch.no_grad():
-            future_values = target_model(outcomes)
+        with torch.no_grad(): future_values = target_model(outcomes)
     value_matrices = future_values.reshape(batch_size,9,9)
     means = torch.mean(value_matrices,2)
     mins = torch.amin(value_matrices,2)
@@ -101,7 +102,7 @@ for batch in range(1000000000000):
     optimizer.zero_grad()
     save_checkpoint(model, target_model, optimizer, discount, horizon, checkpoint_path)
     if isinstance(target_model, ValueModel) and batch > 100:
-        if loss_value < loss_threshold and smooth_loss < loss_threshold:
+        if np.maximum(loss_value, smooth_loss) < loss_threshold:
             horizon += 1
             with torch.no_grad():
                 for target_param, param in zip(target_model.parameters(), model.parameters()):
@@ -109,7 +110,7 @@ for batch in range(1000000000000):
                     target_param.data.copy_(new_target_param)
     message = ''
     message += f'Batch: {batch}, '
-    message += f'Discount: {discount:.4f}, '
+    message += f'Discount: {discount}, '
     message += f'Horizon: {horizon}, '
     message += f'Loss: {loss_value:07.4f}, '
     message += f'Smooth: {smooth_loss:07.4f}'
