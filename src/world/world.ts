@@ -15,6 +15,7 @@ export class World {
   summary: WorldSummary
   timeStep = 0.04
   timeScale = 1
+  paused = false
 
   constructor () {
     this.arena = new Arena(this)
@@ -43,14 +44,17 @@ export class World {
     }
   }
 
+  preStep (): void {}
   postStep (): void {}
 
-  preStep (): void {}
-
   step (): void {
+    if (this.paused) return
     this.preStep()
     const dt = this.timeStep
     const agentCount = this.agents.length
+    this.agents.forEach(agent => {
+      if (agent.dead) agent.respawn()
+    })
     range(agentCount).forEach(i => {
       const agent = this.agents[i]
       const blade = this.blades[i]
@@ -70,6 +74,9 @@ export class World {
       const agent = this.agents[i]
       const vector = sub(agent.position, blade.position)
       blade.force = mul(blade.movePower, vector)
+    })
+    this.agents.forEach(agent => {
+      this.checkDeath(agent)
     })
     range(agentCount).forEach(i => {
       range(agentCount).forEach(j => {
@@ -92,12 +99,6 @@ export class World {
     this.circles.forEach(circle => {
       circle.history.unshift(circle.position)
       circle.history = circle.history.slice(0, Circle.historyLength)
-    })
-    this.agents.forEach(agent => {
-      this.checkDeath(agent)
-    })
-    this.agents.forEach(agent => {
-      if (agent.dead) agent.respawn()
     })
     this.postStep()
   }

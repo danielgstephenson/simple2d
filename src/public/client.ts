@@ -8,6 +8,21 @@ import { actionVectors } from '../actionVectors'
 const renderer = new Renderer()
 const input = new Input()
 
+const socket = io()
+socket.on('connect', () => {
+  console.log('connect')
+})
+socket.on('renderScale', (renderScale: number) => {
+  renderer.renderScale = renderScale
+})
+socket.on('summary', (summary: WorldSummary) => {
+  renderer.summary = summary
+})
+
+window.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (!event.repeat) socket.emit('unpause')
+})
+
 function sendAction (): void {
   renderer.camera.updateScale(input.zoom)
   let x = 0
@@ -25,16 +40,4 @@ function sendAction (): void {
   const action = whichMax(dots)
   socket.emit('action', action)
 }
-
 setInterval(sendAction, 20)
-
-const socket = io()
-socket.on('connect', () => {
-  console.log('connect')
-})
-socket.on('renderScale', (renderScale: number) => {
-  renderer.renderScale = renderScale
-})
-socket.on('summary', (summary: WorldSummary) => {
-  renderer.summary = summary
-})

@@ -9,15 +9,24 @@ export class Input {
   zoom = 0
 
   constructor () {
-    window.onkeydown = (event: KeyboardEvent) => this.onkeydown(event)
-    window.onkeyup = (event: KeyboardEvent) => this.onkeyup(event)
-    window.onwheel = (event: WheelEvent) => this.onwheel(event)
-    window.onmousemove = (event: MouseEvent) => this.onmousemove(event)
-    window.onmousedown = (event: MouseEvent) => this.onmousedown(event)
-    window.onmouseup = (event: MouseEvent) => this.onmouseup(event)
-    window.ontouchmove = (event: TouchEvent) => this.ontouchmove(event)
-    window.ontouchstart = (event: TouchEvent) => this.ontouchstart(event)
-    window.ontouchend = (event: TouchEvent) => this.ontouchend(event)
+    window.addEventListener('keydown', (event: KeyboardEvent) => this.onkeydown(event))
+    window.addEventListener('keyup', (event: KeyboardEvent) => this.onkeyup(event))
+    window.addEventListener('wheel', (event: WheelEvent) => this.onwheel(event))
+    window.addEventListener('mousemove', (event: MouseEvent) => this.onmousemove(event))
+    window.addEventListener('mousedown', (event: MouseEvent) => this.onmousedown(event))
+    window.addEventListener('mouseup', (event: MouseEvent) => this.onmouseup(event))
+    window.addEventListener('touchmove', (event: TouchEvent) => this.ontouchmove(event))
+    window.addEventListener('touchstart', (event: TouchEvent) => this.ontouchstart(event))
+    window.addEventListener('touchend', (event: TouchEvent) => this.ontouchend(event))
+    // window.onkeydown = (event: KeyboardEvent) => this.onkeydown(event)
+    // window.onkeyup = (event: KeyboardEvent) => this.onkeyup(event)
+    // window.onwheel = (event: WheelEvent) => this.onwheel(event)
+    // window.onmousemove = (event: MouseEvent) => this.onmousemove(event)
+    // window.onmousedown = (event: MouseEvent) => this.onmousedown(event)
+    // window.onmouseup = (event: MouseEvent) => this.onmouseup(event)
+    // window.ontouchmove = (event: TouchEvent) => this.ontouchmove(event)
+    // window.ontouchstart = (event: TouchEvent) => this.ontouchstart(event)
+    // window.ontouchend = (event: TouchEvent) => this.ontouchend(event)
     window.oncontextmenu = () => {}
   }
 

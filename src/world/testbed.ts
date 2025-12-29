@@ -17,14 +17,17 @@ export class Testbed extends World {
     this.begin()
   }
 
+  preStep (): void {
+    this.bot.action = this.brain.action
+  }
+
   postStep (): void {
     this.summary = this.summarize()
     const state = this.getState()
     void this.brain.update(state)
-  }
-
-  preStep (): void {
-    this.bot.action = this.brain.action
+    if (this.player.dead) {
+      this.paused = true
+    }
   }
 
   getState (): number[] {

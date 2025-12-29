@@ -2,7 +2,7 @@ import { pi } from '../math'
 import { World } from '../world/world'
 
 export class Circle {
-  static historyLength = 15
+  static historyLength = 20
   world: World
   radius: number
   mass: number

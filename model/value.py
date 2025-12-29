@@ -39,6 +39,7 @@ class ValueModel(torch.nn.Module):
         return super().__call__(*args, **kwds)
 
 checkpoint_path = './checkpoints/value_checkpoint.pt'
+target_checkpoint_path = './checkpoints/value_checkpoint.pt'
 onnx_path = './onnx/value.onnx'
 model = ValueModel().to(device)
 target_model = ValueModel().to(device).eval()
@@ -52,8 +53,11 @@ if os.path.exists(checkpoint_path):
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     discount = checkpoint['discount']
     horizon = checkpoint['horizon']
-# horizon = 0
-# discount = 0.98
+if os.path.exists(target_checkpoint_path):
+    checkpoint = torch.load(checkpoint_path, weights_only=False)
+    target_model.load_state_dict(checkpoint['model_state_dict'])
+# horizon = 1
+# discount = 0.9
 
 if isinstance(target_model, ValueModel):
     target_model.load_state_dict(model.state_dict())
@@ -65,16 +69,16 @@ for param_group in optimizer.param_groups:
 print('Saving onnx...')
 save_onnx(model, onnx_path, device)
 
-batch_size = 3000 # Reduce to 3000 if the horizon can exceed zero or GPU memory is limited
+batch_size = 5000 # Reduce to 3000 if GPU memory is limited
 generator = Generator(batch_size, device, steps=5)
 
 # quit()
 
-self_noise = 0.1 # 0.2 or 0.3 ?
+self_noise = 0.2 # 0.2 or 0.3 ?
 other_noise = 0.01
 smooth_loss = 0
-loss_smoothing = 0.01
-loss_threshold = -1 # The horizon never exceeds zero if this is negative
+loss_smoothing = 0.05
+loss_threshold = 0.02 # If this is negative then the horizon never increases
 print('Training...')
 for batch in range(1000000000000):
     data = generator.generate()
@@ -103,13 +107,12 @@ for batch in range(1000000000000):
     optimizer.step()
     optimizer.zero_grad()
     save_checkpoint(model, target_model, optimizer, discount, horizon, checkpoint_path)
-    if batch > 100 and np.maximum(loss_value, smooth_loss) < loss_threshold:
+    if batch > 50 and np.maximum(loss_value, smooth_loss) < loss_threshold:
         horizon += 1
+        smooth_loss = 2 * smooth_loss
         with torch.no_grad():
             for target_param, param in zip(target_model.parameters(), model.parameters()):
-                smooth_loss = 2 * smooth_loss
-                new_target_param = param.data
-                target_param.data.copy_(new_target_param)
+                target_param.data.copy_(param.data)
     message = ''
     message += f'Batch: {batch}, '
     message += f'Discount: {discount}, '

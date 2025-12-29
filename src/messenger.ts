@@ -26,6 +26,9 @@ export class Messenger {
           this.world.agents[0].action = action
         }
       })
+      socket.on('unpause', () => {
+        this.world.paused = false
+      })
       socket.on('disconnect', () => {
         console.log(socket.id, 'disconnected')
       })
