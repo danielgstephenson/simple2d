@@ -1,5 +1,6 @@
 import { Brain } from '../brain'
 import { Agent } from '../entities/agent'
+import { range } from '../math'
 import { World } from './world'
 
 export class Testbed extends World {
@@ -33,6 +34,13 @@ export class Testbed extends World {
   getState (): number[] {
     const playerState = this.player.getState()
     const botState = this.bot.getState()
+    // For Pursuit:
+    // const origin = [playerState[0], playerState[1]]
+    // for (const i of range(8)) {
+    //   const j = i % 2
+    //   playerState[i] = playerState[i] - origin[j]
+    //   botState[i] = botState[i] - origin[j]
+    // }
     return [...botState, ...playerState]
   }
 }

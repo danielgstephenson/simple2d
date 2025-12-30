@@ -69,13 +69,13 @@ for param_group in optimizer.param_groups:
 print('Saving onnx...')
 save_onnx(model, onnx_path, device)
 
-batch_size = 5000 # Reduce to 3000 if GPU memory is limited
+batch_size = 3000 # Reduce to 3000 if GPU memory is limited
 generator = Generator(batch_size, device, steps=5)
 
 # quit()
 
-self_noise = 0.2 # 0.2 or 0.3 ?
-other_noise = 0.01
+self_noise = 0.2
+other_noise = 0.2
 smooth_loss = 0
 loss_smoothing = 0.05
 loss_threshold = 0.02 # If this is negative then the horizon never increases
