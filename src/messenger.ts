@@ -1,8 +1,8 @@
 import { Server } from './server'
 import { Server as SocketIoServer } from 'socket.io'
 import { World } from './world/world'
-import { Testbed } from './world/testbed'
-import { svgObject } from './entities/level'
+import { TestCavern } from './world/testCavern'
+import { TestArena } from './world/testArena'
 
 export class Messenger {
   server: Server
@@ -13,11 +13,11 @@ export class Messenger {
     console.log('messenger')
     this.io = new SocketIoServer(server.httpServer)
     this.server = server
-    this.world = new Testbed()
+    this.world = new TestCavern()
     this.setupIo()
     setInterval(() => this.update(), 20)
-    console.log('svg json:')
-    console.log(JSON.stringify(svgObject, null, 2))
+    // console.log('svg json:')
+    // console.log(JSON.stringify(svgObject, null, 2))
   }
 
   setupIo (): void {

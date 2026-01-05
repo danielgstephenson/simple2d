@@ -2,7 +2,7 @@ import { Brain } from '../brain'
 import { Agent } from '../entities/agent'
 import { World } from './world'
 
-export class Testbed extends World {
+export class TestArena extends World {
   brain = new Brain()
   player: Agent
   bot: Agent

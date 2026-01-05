@@ -3,12 +3,11 @@ import { Agent } from '../entities/agent'
 import { Arena, ArenaSummary } from '../entities/arena'
 import { Blade } from '../entities/blade'
 import { Circle, CircleSummary } from '../entities/circle'
-import { Wall, WallSummary } from '../entities/wall'
 import { combine, dirFromTo, dot, getDistance, mul, range, sub } from '../math'
 
 export class World {
   agents: Agent[] = []
-  walls: Wall[] = []
+  walls: number[][][] = []
   blades: Blade[] = []
   circles: Circle[] = []
   arena: Arena
@@ -31,15 +30,11 @@ export class World {
     return agent
   }
 
-  addWall (a: number[], b: number[]): Wall {
-    return new Wall(this, a, b)
-  }
-
   summarize (): WorldSummary {
     return {
       agents: this.agents.map(c => c.summarize()),
       blades: this.blades.map(b => b.summarize()),
-      walls: this.walls.map(w => w.summarize()),
+      walls: this.walls,
       arena: this.arena.summarize()
     }
   }
@@ -134,6 +129,6 @@ export class World {
 export interface WorldSummary {
   agents: CircleSummary[]
   blades: CircleSummary[]
-  walls: WallSummary[]
+  walls: number[][][]
   arena: ArenaSummary
 }

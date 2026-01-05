@@ -3,7 +3,6 @@ import { Agent } from './entities/agent'
 import { Arena, ArenaSummary } from './entities/arena'
 import { Blade } from './entities/blade'
 import { Circle } from './entities/circle'
-import { WallSummary } from './entities/wall'
 import { combine, dirFromTo, getDistance, range, X, Y } from './math'
 import { WorldSummary } from './world/world'
 
@@ -64,8 +63,6 @@ export class Renderer {
     this.context.lineWidth = 0.2
     this.context.beginPath()
     this.context.arc(0, 0, 5, 0, 2 * Math.PI)
-    this.context.arc(0, 0, 10, 0, 2 * Math.PI)
-    this.context.arc(0, 0, 20, 0, 2 * Math.PI)
     this.context.moveTo(0, Arena.size)
     this.context.lineTo(0, -Arena.size)
     this.context.moveTo(Arena.size, 0)
@@ -124,13 +121,18 @@ export class Renderer {
     this.context.fill()
   }
 
-  drawWall (wall: WallSummary): void {
+  drawWall (wall: number[][]): void {
     this.resetContext()
     this.context.strokeStyle = 'hsla(0, 0%, 50%, 1)'
     this.context.lineWidth = 0.1
     this.context.beginPath()
-    this.context.moveTo(wall.a[X], wall.a[Y])
-    this.context.lineTo(wall.b[X], wall.b[Y])
+    wall.forEach((point, i) => {
+      if (i === 0) this.context.moveTo(point[X], point[Y])
+      else this.context.lineTo(point[X], point[Y])
+      if (wall.length < 3 || i + 1 !== wall.length) return
+      const start = wall[0]
+      this.context.lineTo(start[X], start[Y])
+    })
     this.context.stroke()
   }
 
