@@ -3,7 +3,7 @@ import { Circle } from './circle'
 
 export class Blade extends Circle {
   static radius = 1
-  agent: Agent
+  agent?: Agent
   drag = 0.3
   movePower = 4
   velocity = [0, 0]

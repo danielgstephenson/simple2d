@@ -16,6 +16,6 @@
     "sourceMap": true,
     "target": "ESNext"
   },
-  "include": ["**/*","*.json"],
+  "include": ["**/*","*.json","*.d.ts"],
   "exclude": ["../dist/**/*"]
 }

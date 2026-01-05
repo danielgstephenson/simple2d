@@ -1,6 +1,5 @@
 import { Brain } from '../brain'
 import { Agent } from '../entities/agent'
-import { range } from '../math'
 import { World } from './world'
 
 export class Testbed extends World {

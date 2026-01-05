@@ -55,25 +55,25 @@ export class World {
     this.agents.forEach(agent => {
       if (agent.dead) agent.respawn()
     })
-    range(agentCount).forEach(i => {
-      const agent = this.agents[i]
-      const blade = this.blades[i]
+    this.agents.forEach(agent => {
       agent.force = [0, 0]
-      blade.force = [0, 0]
       agent.impulse = [0, 0]
-      blade.impulse = [0, 0]
       agent.shift = [0, 0]
+    })
+    this.blades.forEach(blade => {
+      blade.force = [0, 0]
+      blade.impulse = [0, 0]
       blade.shift = [0, 0]
     })
-    range(agentCount).forEach(i => {
-      const agent = this.agents[i]
+    this.agents.forEach(agent => {
       agent.force = mul(agent.movePower, actionVectors[agent.action])
     })
     range(agentCount).forEach(i => {
-      const blade = this.blades[i]
       const agent = this.agents[i]
-      const vector = sub(agent.position, blade.position)
-      blade.force = mul(blade.movePower, vector)
+      if (agent.blade != null) {
+        const vector = sub(agent.position, agent.blade.position)
+        agent.blade.force = mul(agent.blade.movePower, vector)
+      }
     })
     this.agents.forEach(agent => {
       this.checkDeath(agent)
@@ -122,7 +122,7 @@ export class World {
 
   checkDeath (agent: Agent): void {
     this.blades.forEach(blade => {
-      if (blade.id === agent.blade.id) return
+      if (agent.blade != null && blade.id === agent.blade.id) return
       const distance = getDistance(agent.position, blade.position)
       const overlap = agent.radius + blade.radius - distance
       if (overlap < 0) return

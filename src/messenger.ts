@@ -2,6 +2,7 @@ import { Server } from './server'
 import { Server as SocketIoServer } from 'socket.io'
 import { World } from './world/world'
 import { Testbed } from './world/testbed'
+import { svgObject } from './entities/level'
 
 export class Messenger {
   server: Server
@@ -15,6 +16,8 @@ export class Messenger {
     this.world = new Testbed()
     this.setupIo()
     setInterval(() => this.update(), 20)
+    console.log('svg json:')
+    console.log(JSON.stringify(svgObject, null, 2))
   }
 
   setupIo (): void {
