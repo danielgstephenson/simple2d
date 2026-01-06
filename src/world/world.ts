@@ -1,6 +1,5 @@
 import { actionVectors } from '../actionVectors'
 import { Agent } from '../entities/agent'
-import { Arena, ArenaSummary } from '../entities/arena'
 import { Blade } from '../entities/blade'
 import { Circle, CircleSummary } from '../entities/circle'
 import { combine, dirFromTo, dot, getDistance, mul, range, sub } from '../math'
@@ -8,16 +7,15 @@ import { combine, dirFromTo, dot, getDistance, mul, range, sub } from '../math'
 export class World {
   agents: Agent[] = []
   walls: number[][][] = []
+  boundary: number[][] = [] // This is the outer boundary
   blades: Blade[] = []
   circles: Circle[] = []
-  arena: Arena
   summary: WorldSummary
   timeStep = 0.04
   timeScale = 1
   paused = false
 
   constructor () {
-    this.arena = new Arena(this)
     this.summary = this.summarize()
   }
 
@@ -32,10 +30,10 @@ export class World {
 
   summarize (): WorldSummary {
     return {
-      agents: this.agents.map(c => c.summarize()),
-      blades: this.blades.map(b => b.summarize()),
+      boundary: this.boundary,
       walls: this.walls,
-      arena: this.arena.summarize()
+      agents: this.agents.map(c => c.summarize()),
+      blades: this.blades.map(b => b.summarize())
     }
   }
 
@@ -130,5 +128,5 @@ export interface WorldSummary {
   agents: CircleSummary[]
   blades: CircleSummary[]
   walls: number[][][]
-  arena: ArenaSummary
+  boundary: number[][]
 }

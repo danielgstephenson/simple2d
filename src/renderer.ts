@@ -1,6 +1,5 @@
 import { Camera } from './camera'
 import { Agent } from './entities/agent'
-import { Arena, ArenaSummary } from './entities/arena'
 import { Blade } from './entities/blade'
 import { Circle } from './entities/circle'
 import { combine, dirFromTo, getDistance, range, X, Y } from './math'
@@ -21,10 +20,10 @@ export class Renderer {
 
   constructor () {
     this.summary = {
+      boundary: [],
       walls: [],
       blades: [],
-      agents: [],
-      arena: { boundary: [] }
+      agents: []
     }
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
@@ -35,7 +34,7 @@ export class Renderer {
     window.requestAnimationFrame(() => this.draw())
     this.setupCanvas()
     this.followPlayer()
-    this.drawArena(this.summary.arena)
+    this.drawBoundary(this.summary.boundary)
     const agentCount = this.summary.agents.length
     range(agentCount).forEach(i => this.drawSpring(i))
     range(agentCount).forEach(i => this.drawBlade(i))
@@ -43,8 +42,7 @@ export class Renderer {
     this.summary.walls.forEach(w => this.drawWall(w))
   }
 
-  drawArena (arena: ArenaSummary): void {
-    const boundary = arena.boundary
+  drawBoundary (boundary: number[][]): void {
     this.context.fillStyle = this.wallColor
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
     this.resetContext()
@@ -58,16 +56,16 @@ export class Renderer {
     this.context.fill()
     this.context.save()
     this.context.clip()
-    this.context.strokeStyle = this.traceColor
-    this.context.lineCap = 'round'
-    this.context.lineWidth = 0.2
-    this.context.beginPath()
-    this.context.arc(0, 0, 5, 0, 2 * Math.PI)
-    this.context.moveTo(0, Arena.size)
-    this.context.lineTo(0, -Arena.size)
-    this.context.moveTo(Arena.size, 0)
-    this.context.lineTo(-Arena.size, 0)
-    this.context.stroke()
+    // this.context.strokeStyle = this.traceColor
+    // this.context.lineCap = 'round'
+    // this.context.lineWidth = 0.2
+    // this.context.beginPath()
+    // this.context.arc(0, 0, 5, 0, 2 * Math.PI)
+    // this.context.moveTo(0, Arena.size)
+    // this.context.lineTo(0, -Arena.size)
+    // this.context.moveTo(Arena.size, 0)
+    // this.context.lineTo(-Arena.size, 0)
+    // this.context.stroke()
   }
 
   drawSpring (i: number): void {
