@@ -12,7 +12,7 @@ export class Renderer {
   summary: WorldSummary
   renderScale = 1
   backgroundColor = 'hsl(0,0%,0%)'
-  wallColor = 'hsl(0,0%,20%)'
+  wallColor = 'hsl(0,0%,10%)'
   traceColor = 'hsla(0, 0%, 10%, 1.00)'
   springColor = 'hsla(0, 100%, 100%, 0.1)'
   agentColors = ['hsla(220,100%, 45%, 1.0)', 'hsla(120, 100%, 30%, 1.0)']
@@ -81,6 +81,19 @@ export class Renderer {
     this.context.stroke()
   }
 
+  drawWall (wall: number[][]): void {
+    this.resetContext()
+    this.context.fillStyle = this.wallColor
+    this.context.lineWidth = 0.1
+    this.context.beginPath()
+    this.context.beginPath()
+    wall.forEach((point, i) => {
+      if (i === 0) this.context.moveTo(point[X], point[Y])
+      else this.context.lineTo(point[X], point[Y])
+    })
+    this.context.fill()
+  }
+
   drawSpring (i: number): void {
     this.resetContext()
     this.context.strokeStyle = this.springColor
@@ -103,7 +116,7 @@ export class Renderer {
     const blade = this.summary.blades[i]
     const L = Circle.historyLength
     blade.history.forEach((position, i) => {
-      const a = 0.02 * (L - i) / L
+      const a = 0.01 * (L - i) / L
       this.context.fillStyle = `hsla(0, 0%, 50%, ${a})`
       this.context.beginPath()
       this.context.arc(position[X], position[Y], Blade.radius, 0, 2 * Math.PI)
@@ -130,21 +143,6 @@ export class Renderer {
     this.context.beginPath()
     this.context.arc(agent.position[X], agent.position[Y], Agent.radius, 0, 2 * Math.PI)
     this.context.fill()
-  }
-
-  drawWall (wall: number[][]): void {
-    this.resetContext()
-    this.context.strokeStyle = 'hsla(0, 0%, 50%, 1)'
-    this.context.lineWidth = 0.1
-    this.context.beginPath()
-    wall.forEach((point, i) => {
-      if (i === 0) this.context.moveTo(point[X], point[Y])
-      else this.context.lineTo(point[X], point[Y])
-      if (wall.length < 3 || i + 1 !== wall.length) return
-      const start = wall[0]
-      this.context.lineTo(start[X], start[Y])
-    })
-    this.context.stroke()
   }
 
   followPlayer (): void {

@@ -108,6 +108,13 @@ export function whichMin (array: number[]): number {
   return whichMax(negArray)
 }
 
+export function clampVec (vector: number[], maxLength: number): number[] {
+  const length = getLength(vector)
+  if (length < maxLength) return vector
+  const direction = normalize(vector)
+  return mul(maxLength, direction)
+}
+
 // export function getAngleDiff (toAngle: number, fromAngle: number): number {
 //   const v = { x: Math.cos(fromAngle), y: Math.sin(fromAngle) }
 //   const w = { x: Math.cos(toAngle), y: Math.sin(toAngle) }
@@ -133,13 +140,6 @@ export function whichMin (array: number[]): number {
 //   if (dir.length() === 0) return dir
 //   const dots = compassDirs.map(compassDir => Vec2.dot(compassDir, dir))
 //   return compassDirs[whichMax(dots)]
-// }
-
-// export function clampVec (vector: Vec2, maxLength: number): Vec2 {
-//   const length = vector.length()
-//   if (length < maxLength) return vector
-//   const direction = normalize(vector)
-//   return Vec2.mul(direction, maxLength)
 // }
 
 // export function project (a: Vec2, b: Vec2): Vec2 {

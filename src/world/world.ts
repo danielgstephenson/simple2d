@@ -2,7 +2,7 @@ import { actionVectors } from '../actionVectors'
 import { Agent } from '../entities/agent'
 import { Blade } from '../entities/blade'
 import { Circle, CircleSummary } from '../entities/circle'
-import { add, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
+import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
 
 export class World {
   agents: Agent[] = []
@@ -65,7 +65,8 @@ export class World {
       const agent = this.agents[i]
       if (agent.blade != null) {
         const vector = sub(agent.position, agent.blade.position)
-        agent.blade.force = mul(agent.blade.movePower, vector)
+        const clampedVector = clampVec(vector, 10)
+        agent.blade.force = mul(agent.blade.movePower, clampedVector)
       }
     })
     this.agents.forEach(agent => {

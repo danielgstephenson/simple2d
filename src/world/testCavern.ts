@@ -10,10 +10,16 @@ export class TestCavern extends World {
     super()
     this.player = this.addAgent([-3, 0])
     this.boundary = [
-      [0, -20],
-      [20, 20],
-      [-20, 20]
+      [-10, -30],
+      [10, -20],
+      [25, 25],
+      [-25, 15]
     ]
+    this.walls.push([
+      [5, 5],
+      [5, 10],
+      [10, 10]
+    ])
     this.summary = this.summarize()
     this.begin()
   }
