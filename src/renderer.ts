@@ -56,16 +56,29 @@ export class Renderer {
     this.context.fill()
     this.context.save()
     this.context.clip()
-    // this.context.strokeStyle = this.traceColor
-    // this.context.lineCap = 'round'
-    // this.context.lineWidth = 0.2
-    // this.context.beginPath()
-    // this.context.arc(0, 0, 5, 0, 2 * Math.PI)
-    // this.context.moveTo(0, Arena.size)
-    // this.context.lineTo(0, -Arena.size)
-    // this.context.moveTo(Arena.size, 0)
-    // this.context.lineTo(-Arena.size, 0)
-    // this.context.stroke()
+    this.context.strokeStyle = 'hsla(180, 100%, 5%)'
+    this.context.lineCap = 'round'
+    this.context.lineWidth = 0.03
+    const size = 1.2
+    const points = [
+      [0, size],
+      [0, -size],
+      [size, 0],
+      [-size, 0],
+      [+size * Math.SQRT1_2, +size * Math.SQRT1_2],
+      [-size * Math.SQRT1_2, -size * Math.SQRT1_2],
+      [+size * Math.SQRT1_2, -size * Math.SQRT1_2],
+      [-size * Math.SQRT1_2, +size * Math.SQRT1_2]
+    ]
+    this.context.beginPath()
+    this.context.arc(0, 0, size, 0, 2 * Math.PI)
+    for (const a of points) {
+      for (const b of points) {
+        this.context.moveTo(a[X], a[Y])
+        this.context.lineTo(b[X], b[Y])
+      }
+    }
+    this.context.stroke()
   }
 
   drawSpring (i: number): void {

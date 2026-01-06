@@ -2,7 +2,7 @@ import { actionVectors } from '../actionVectors'
 import { Agent } from '../entities/agent'
 import { Blade } from '../entities/blade'
 import { Circle, CircleSummary } from '../entities/circle'
-import { combine, dirFromTo, dot, getDistance, mul, range, sub } from '../math'
+import { add, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
 
 export class World {
   agents: Agent[] = []
@@ -83,6 +83,12 @@ export class World {
       })
     })
     this.circles.forEach(circle => {
+      this.collideCircleWall(circle, this.boundary)
+      this.walls.forEach(wall => {
+        this.collideCircleWall(circle, wall)
+      })
+    })
+    this.circles.forEach(circle => {
       circle.velocity = mul(1 - circle.drag * dt, circle.velocity)
       circle.velocity = combine(1, circle.velocity, dt / circle.mass, circle.force)
       circle.velocity = combine(1, circle.velocity, 1 / circle.mass, circle.impulse)
@@ -111,6 +117,46 @@ export class World {
     circle2.impulse = combine(1, circle2.impulse, +1, impulse)
     circle1.shift = combine(1, circle1.shift, -1, shift)
     circle2.shift = combine(1, circle2.shift, +1, shift)
+  }
+
+  collideCircleWall (circle: Circle, wall: number[][]): void {
+    range(wall.length).forEach(i => {
+      const j = i > 0 ? i - 1 : wall.length - 1
+      const a = wall[i]
+      const b = wall[j]
+      const c = circle.position
+      this.collideCirclePoint(circle, a)
+      const ab = sub(b, a)
+      const ac = sub(c, a)
+      const bc = sub(c, b)
+      const dir = normalize(ab)
+      const normal = [-dir[Y], +dir[X]]
+      if (dot(normal, ac) < 0) {
+        normal[X] = -normal[X]
+        normal[Y] = -normal[Y]
+      }
+      if (dot(ac, ab) < 0) return
+      if (dot(bc, ab) > 0) return
+      const overlap = circle.radius - dot(ac, normal)
+      if (overlap < 0) return
+      const impactSpeed = -dot(circle.velocity, normal)
+      const impulse = mul(impactSpeed, normal)
+      circle.impulse = add(circle.impulse, impulse)
+      const shift = mul(overlap, normal)
+      circle.shift = add(circle.shift, shift)
+    })
+  }
+
+  collideCirclePoint (circle: Circle, point: number[]): void {
+    const distance = getDistance(circle.position, point)
+    const overlap = circle.radius - distance
+    if (overlap <= 0) return
+    const normal = dirFromTo(point, circle.position)
+    const impactSpeed = -dot(circle.velocity, normal)
+    const impulse = mul(impactSpeed, normal)
+    circle.impulse = add(circle.impulse, impulse)
+    const shift = mul(overlap, normal)
+    circle.shift = add(circle.shift, shift)
   }
 
   checkDeath (agent: Agent): void {
