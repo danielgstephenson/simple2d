@@ -125,10 +125,10 @@ export class World {
     return true
   }
 
-  collideCircleWall (circle: Circle, wall: number[][]): boolean {
+  collideCircleWall (circle: Circle, wall: number[][]): void {
     for (const point of wall) {
       if (this.collideCirclePoint(circle, point)) {
-        return true
+        return
       }
     }
     for (const i of range(wall.length)) {
@@ -150,13 +150,11 @@ export class World {
       const overlap = circle.radius - dot(ac, normal)
       if (overlap < 0) continue
       const impactSpeed = -dot(circle.velocity, normal)
-      const impulse = mul(impactSpeed, normal)
+      const impulse = mul(impactSpeed * circle.mass, normal)
       circle.impulse = add(circle.impulse, impulse)
       const shift = mul(overlap, normal)
       circle.shift = add(circle.shift, shift)
-      return true
     }
-    return false
   }
 
   collideCirclePoint (circle: Circle, point: number[]): boolean {
