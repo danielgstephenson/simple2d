@@ -1,7 +1,7 @@
 import { actionVectors } from '../actionVectors'
-import { Agent } from '../entities/agent'
-import { Blade } from '../entities/blade'
-import { Circle, CircleSummary } from '../entities/circle'
+import { Agent, AgentSummary } from '../entities/agent'
+import { Blade, BladeSummary } from '../entities/blade'
+import { Circle } from '../entities/circle'
 import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
 
 export class World {
@@ -28,6 +28,11 @@ export class World {
     return agent
   }
 
+  addBlade (position: number[]): Blade {
+    const blade = new Blade(this, position)
+    return blade
+  }
+
   summarize (): WorldSummary {
     return {
       boundary: this.boundary,
@@ -44,10 +49,6 @@ export class World {
     if (this.paused) return
     this.preStep()
     const dt = this.timeStep
-    const agentCount = this.agents.length
-    this.agents.forEach(agent => {
-      if (agent.dead) agent.respawn()
-    })
     this.agents.forEach(agent => {
       agent.force = [0, 0]
       agent.impulse = [0, 0]
@@ -59,27 +60,31 @@ export class World {
       blade.shift = [0, 0]
     })
     this.agents.forEach(agent => {
+      if (agent.dead) return
       agent.force = mul(agent.movePower, actionVectors[agent.action])
     })
-    range(agentCount).forEach(i => {
-      const agent = this.agents[i]
-      if (agent.blade != null) {
-        const vector = sub(agent.position, agent.blade.position)
+    this.blades.forEach(blade => {
+      if (blade.agent != null) {
+        const vector = sub(blade.agent.position, blade.position)
         const clampedVector = clampVec(vector, 10)
-        agent.blade.force = mul(agent.blade.movePower, clampedVector)
+        blade.force = mul(blade.movePower, clampedVector)
       }
     })
     this.agents.forEach(agent => {
-      this.checkDeath(agent)
+      if (agent.dead) return
+      this.checkBlades(agent)
     })
-    range(agentCount).forEach(i => {
-      range(agentCount).forEach(j => {
-        if (i >= j) return
-        const agent1 = this.agents[i]
-        const agent2 = this.agents[j]
+    this.agents.forEach(agent1 => {
+      if (agent1.dead) return
+      this.agents.forEach(agent2 => {
+        if (agent2.dead) return
+        if (agent1.index >= agent2.index) return
         this.collideCircleCircle(agent1, agent2)
-        const blade1 = this.blades[i]
-        const blade2 = this.blades[j]
+      })
+    })
+    this.blades.forEach(blade1 => {
+      this.blades.forEach(blade2 => {
+        if (blade1.index >= blade2.index) return
         this.collideCircleCircle(blade1, blade2)
       })
     })
@@ -104,7 +109,6 @@ export class World {
   }
 
   collideCircleCircle (circle1: Circle, circle2: Circle): boolean {
-    if (circle1.id >= circle2.id) return false
     const distance = getDistance(circle1.position, circle2.position)
     const overlap = circle1.radius + circle2.radius - distance
     if (overlap <= 0) return false
@@ -168,20 +172,25 @@ export class World {
     return true
   }
 
-  checkDeath (agent: Agent): void {
+  checkBlades (agent: Agent): void {
+    if (agent.dead) return
     this.blades.forEach(blade => {
-      if (agent.blade != null && blade.id === agent.blade.id) return
+      if (agent.dead) return
       const distance = getDistance(agent.position, blade.position)
       const overlap = agent.radius + blade.radius - distance
       if (overlap < 0) return
-      agent.dead = true
+      if (blade.align === 0 || blade.align === agent.align) {
+        if (agent.blade == null && blade.agent == null) blade.attach(agent)
+        return
+      }
+      agent.die()
     })
   }
 }
 
 export interface WorldSummary {
-  agents: CircleSummary[]
-  blades: CircleSummary[]
+  agents: AgentSummary[]
+  blades: BladeSummary[]
   walls: number[][][]
   boundary: number[][]
 }

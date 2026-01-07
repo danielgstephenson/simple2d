@@ -1,4 +1,3 @@
-import { combine, normalize } from '../math'
 import { World } from '../world/world'
 import { Blade } from './blade'
 import { Circle } from './circle'
@@ -8,26 +7,33 @@ export class Agent extends Circle {
   blade?: Blade
   drag = 0.7
   movePower = 3
+  spawnPoint = [0, 0]
   velocity = [0, 0]
   force = [0, 0]
   action = 0
   dead = false
+  align = 0
+  index: number
 
   constructor (world: World, position = [0, 0]) {
     super(world, position, Agent.radius)
+    this.spawnPoint = position
+    this.index = world.agents.length
     this.world.agents.push(this)
-    this.blade = new Blade(this, position)
   }
 
   respawn (): void {
     this.dead = false
-    const dir = normalize(this.position)
-    this.position = combine(1, this.position, 15, dir)
+    this.position = this.spawnPoint
     this.velocity = [0, 0]
     if (this.blade != null) {
-      this.blade.position = structuredClone(this.position)
-      this.blade.velocity = [0, 0]
+      this.blade.detach()
     }
+  }
+
+  die (): void {
+    this.dead = true
+    if (this.blade != null) this.blade.detach()
   }
 
   getState (): number[] {
@@ -46,4 +52,22 @@ export class Agent extends Circle {
       this.blade.velocity = [state[6], state[7]]
     }
   }
+
+  summarize (): AgentSummary {
+    return {
+      position: this.position,
+      history: this.history,
+      align: this.align,
+      dead: this.dead,
+      blade: this.blade == null ? undefined : this.blade.index
+    }
+  }
+}
+
+export interface AgentSummary {
+  position: number[]
+  history: number[][]
+  align: number
+  dead: boolean
+  blade?: number
 }

@@ -9,6 +9,12 @@ export class TestCavern extends World {
   constructor () {
     super()
     this.player = this.addAgent([-3, 0])
+    this.player.align = 1
+    this.addBlade([0, 10])
+    this.addAgent([10, 0])
+    const guard = this.addAgent([-10, 0])
+    guard.align = 2
+    this.addBlade([-10.5, 0])
     this.boundary = [
       [-10, -30],
       [10, -20],
@@ -28,6 +34,12 @@ export class TestCavern extends World {
     this.summary = this.summarize()
     if (this.player.dead) {
       this.paused = true
+    }
+  }
+
+  preStep (): void {
+    if (this.player.dead) {
+      this.player.respawn()
     }
   }
 }
