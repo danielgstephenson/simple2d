@@ -1,8 +1,9 @@
 import { Camera } from './camera'
-import { Agent, AgentSummary } from './entities/agent'
+import { Agent, AgentSummary } from './entities/agent/agent'
 import { Blade, BladeSummary } from './entities/blade'
 import { Circle } from './entities/circle'
-import { combine, dirFromTo, getDistance, X, Y } from './math'
+import { Star, StarSummary } from './entities/star'
+import { combine, dirFromTo, getDistance, pi, range } from './math'
 import { WorldSummary } from './world/world'
 
 export class Renderer {
@@ -47,6 +48,7 @@ export class Renderer {
     this.summary.blades.forEach(blade => this.drawSpring(blade))
     this.summary.blades.forEach(blade => this.drawBlade(blade))
     this.summary.agents.forEach(agent => this.drawAgent(agent))
+    this.summary.stars.forEach(star => this.drawStar(star))
   }
 
   drawBoundary (boundary: number[][]): void {
@@ -57,8 +59,8 @@ export class Renderer {
     this.context.fillStyle = this.backgroundColor
     this.context.beginPath()
     boundary.forEach((vertex, i) => {
-      if (i === 0) this.context.moveTo(vertex[X], vertex[Y])
-      else this.context.lineTo(vertex[X], vertex[Y])
+      if (i === 0) this.context.moveTo(vertex[0], vertex[1])
+      else this.context.lineTo(vertex[0], vertex[1])
     })
     this.context.fill()
     this.context.save()
@@ -81,8 +83,8 @@ export class Renderer {
     this.context.arc(0, 0, size, 0, 2 * Math.PI)
     for (const a of points) {
       for (const b of points) {
-        this.context.moveTo(a[X], a[Y])
-        this.context.lineTo(b[X], b[Y])
+        this.context.moveTo(a[0], a[1])
+        this.context.lineTo(b[0], b[1])
       }
     }
     this.context.stroke()
@@ -95,9 +97,31 @@ export class Renderer {
     this.context.beginPath()
     this.context.beginPath()
     wall.forEach((point, i) => {
-      if (i === 0) this.context.moveTo(point[X], point[Y])
-      else this.context.lineTo(point[X], point[Y])
+      if (i === 0) this.context.moveTo(point[0], point[1])
+      else this.context.lineTo(point[0], point[1])
     })
+    this.context.fill()
+  }
+
+  drawStar (star: StarSummary): void {
+    this.resetContext()
+    this.context.fillStyle = this.starColor
+    this.context.beginPath()
+    const origin = star.agent == null
+      ? star.spawnPoint
+      : this.summary.agents[star.agent].position
+    range(5).forEach(i => {
+      const angle0 = (0.5 + 0.4 * i) * pi
+      const x0 = origin[0] + Math.cos(angle0) * Star.radius
+      const y0 = origin[1] + Math.sin(angle0) * Star.radius
+      if (i === 0) this.context.moveTo(x0, y0)
+      else this.context.lineTo(x0, y0)
+      const angle1 = angle0 + 0.2 * pi
+      const x1 = origin[0] + Math.cos(angle1) * Star.radius * 0.45
+      const y1 = origin[1] + Math.sin(angle1) * Star.radius * 0.45
+      this.context.lineTo(x1, y1)
+    })
+    // this.context.arc(star.spawnPoint[0], star.spawnPoint[1], Star.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
@@ -113,8 +137,8 @@ export class Renderer {
     const edgePoint = combine(1, blade.position, Blade.radius, dir)
     this.context.lineCap = 'butt'
     this.context.beginPath()
-    this.context.moveTo(edgePoint[X], edgePoint[Y])
-    this.context.lineTo(agent.position[X], agent.position[Y])
+    this.context.moveTo(edgePoint[0], edgePoint[1])
+    this.context.lineTo(agent.position[0], agent.position[1])
     this.context.stroke()
   }
 
@@ -125,12 +149,12 @@ export class Renderer {
       const a = 0.01 * (L - i) / L
       this.context.fillStyle = `hsla(0, 0%, 50%, ${a})`
       this.context.beginPath()
-      this.context.arc(position[X], position[Y], Blade.radius, 0, 2 * Math.PI)
+      this.context.arc(position[0], position[1], Blade.radius, 0, 2 * Math.PI)
       this.context.fill()
     })
     this.context.fillStyle = this.bladeColors[blade.align]
     this.context.beginPath()
-    this.context.arc(blade.position[X], blade.position[Y], Blade.radius, 0, 2 * Math.PI)
+    this.context.arc(blade.position[0], blade.position[1], Blade.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
@@ -142,12 +166,12 @@ export class Renderer {
       const a = 0.02 * (L - i) / L
       this.context.fillStyle = `hsla(0, 0%, 50%, ${a})`
       this.context.beginPath()
-      this.context.arc(position[X], position[Y], Agent.radius, 0, 2 * Math.PI)
+      this.context.arc(position[0], position[1], Agent.radius, 0, 2 * Math.PI)
       this.context.fill()
     })
     this.context.fillStyle = this.agentColors[agent.align]
     this.context.beginPath()
-    this.context.arc(agent.position[X], agent.position[Y], Agent.radius, 0, 2 * Math.PI)
+    this.context.arc(agent.position[0], agent.position[1], Agent.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
@@ -171,7 +195,7 @@ export class Renderer {
     const vmin = Math.min(this.canvas.width, this.canvas.height)
     this.context.scale(vmin, -vmin)
     this.context.scale(this.camera.scale, this.camera.scale)
-    this.context.translate(-this.camera.position[X], -this.camera.position[Y])
+    this.context.translate(-this.camera.position[0], -this.camera.position[1])
     this.context.globalAlpha = 1
   }
 }

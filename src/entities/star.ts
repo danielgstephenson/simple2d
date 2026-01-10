@@ -1,15 +1,15 @@
 import { World } from '../world/world'
-import { Agent } from './agent'
-import { Circle } from './circle'
+import { Agent } from './agent/agent'
 
-export class Star extends Circle {
+export class Star {
   static radius = 0.4
+  world: World
   spawnPoint = [0, 0]
   agent?: Agent
   index: number
 
   constructor (world: World, position = [0, 0]) {
-    super(world, position, Star.radius)
+    this.world = world
     this.spawnPoint = position
     this.index = world.stars.length
     this.world.stars.push(this)

@@ -1,5 +1,7 @@
 import { actionVectors } from '../actionVectors'
-import { Agent, AgentSummary } from '../entities/agent'
+import { Agent, AgentSummary } from '../entities/agent/agent'
+import { Guard } from '../entities/agent/guard'
+import { Player } from '../entities/agent/player'
 import { Blade, BladeSummary } from '../entities/blade'
 import { Circle } from '../entities/circle'
 import { Star, StarSummary } from '../entities/star'
@@ -28,6 +30,16 @@ export class World {
   addAgent (position: number[]): Agent {
     const agent = new Agent(this, position)
     return agent
+  }
+
+  addPlayer (position: number[]): Player {
+    const player = new Player(this, position)
+    return player
+  }
+
+  addGuard (position: number[]): Guard {
+    const guard = new Guard(this, position)
+    return guard
   }
 
   addBlade (position: number[]): Blade {

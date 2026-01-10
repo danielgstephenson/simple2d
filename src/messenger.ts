@@ -1,7 +1,7 @@
 import { Server } from './server'
 import { Server as SocketIoServer } from 'socket.io'
 import { World } from './world/world'
-import { TestCavern } from './world/testCavern'
+import { TestCavern } from './world/testLevel'
 import { TestArena } from './world/testArena'
 
 export class Messenger {

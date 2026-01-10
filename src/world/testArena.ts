@@ -1,5 +1,5 @@
 import { Brain } from '../brain'
-import { Agent } from '../entities/agent'
+import { Agent } from '../entities/agent/agent'
 import { World } from './world'
 
 export class TestArena extends World {
