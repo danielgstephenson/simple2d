@@ -15,6 +15,7 @@ export class TestCavern extends World {
     const guard = this.addAgent([-10, 0])
     guard.align = 2
     this.addBlade([-10.5, 0])
+    this.addStar([10, 0])
     this.boundary = [
       [-10, -30],
       [10, -20],

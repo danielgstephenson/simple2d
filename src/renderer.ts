@@ -14,6 +14,7 @@ export class Renderer {
   backgroundColor = 'hsl(0,0%,0%)'
   wallColor = 'hsl(0,0%,10%)'
   transportColor = 'hsla(0, 0%, 5%, 1.00)'
+  starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
     'hsla(180, 50%, 25%, 1.0)',
     'hsla(220, 100%, 45%, 1.0)',
@@ -29,7 +30,8 @@ export class Renderer {
       boundary: [],
       walls: [],
       blades: [],
-      agents: []
+      agents: [],
+      stars: []
     }
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D

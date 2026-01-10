@@ -1,10 +1,12 @@
 import { World } from '../world/world'
 import { Blade } from './blade'
 import { Circle } from './circle'
+import { Star } from './star'
 
 export class Agent extends Circle {
   static radius = 0.5
   blade?: Blade
+  star?: Star
   drag = 0.7
   movePower = 3
   spawnPoint = [0, 0]
@@ -22,6 +24,13 @@ export class Agent extends Circle {
     this.world.agents.push(this)
   }
 
+  takeStar (star: Star): void {
+    if (this.star != null) return
+    if (star.agent != null) return
+    this.star = star
+    star.agent = this
+  }
+
   respawn (): void {
     this.dead = false
     this.position = this.spawnPoint
@@ -34,6 +43,7 @@ export class Agent extends Circle {
   die (): void {
     this.dead = true
     if (this.blade != null) this.blade.detach()
+    if (this.star != null) this.star.reset()
   }
 
   getState (): number[] {

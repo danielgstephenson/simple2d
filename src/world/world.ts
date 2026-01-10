@@ -2,14 +2,16 @@ import { actionVectors } from '../actionVectors'
 import { Agent, AgentSummary } from '../entities/agent'
 import { Blade, BladeSummary } from '../entities/blade'
 import { Circle } from '../entities/circle'
+import { Star, StarSummary } from '../entities/star'
 import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
 
 export class World {
   agents: Agent[] = []
+  blades: Blade[] = []
+  stars: Star[] = []
+  circles: Circle[] = []
   walls: number[][][] = []
   boundary: number[][] = [] // This is the outer boundary
-  blades: Blade[] = []
-  circles: Circle[] = []
   summary: WorldSummary
   timeStep = 0.04
   timeScale = 1
@@ -33,12 +35,18 @@ export class World {
     return blade
   }
 
+  addStar (position: number[]): Star {
+    const star = new Star(this, position)
+    return star
+  }
+
   summarize (): WorldSummary {
     return {
       boundary: this.boundary,
       walls: this.walls,
       agents: this.agents.map(c => c.summarize()),
-      blades: this.blades.map(b => b.summarize())
+      blades: this.blades.map(b => b.summarize()),
+      stars: this.stars.map(s => s.summarize())
     }
   }
 
@@ -115,8 +123,8 @@ export class World {
     const normal = dirFromTo(circle1.position, circle2.position)
     const relativeVelocity = sub(circle1.velocity, circle2.velocity)
     const impactSpeed = dot(relativeVelocity, normal)
-    const massFactor = 1 / circle1.mass + 1 / circle2.mass
-    const impulse = mul(impactSpeed / massFactor, normal)
+    const massFactor = 1 / (1 / circle1.mass + 1 / circle2.mass)
+    const impulse = mul(impactSpeed * massFactor, normal)
     const shift = mul(0.5 * overlap, normal)
     circle1.impulse = combine(1, circle1.impulse, -1, impulse)
     circle2.impulse = combine(1, circle2.impulse, +1, impulse)
@@ -163,7 +171,7 @@ export class World {
     if (overlap <= 0) return false
     const normal = dirFromTo(point, circle.position)
     const impactSpeed = -dot(circle.velocity, normal)
-    const impulse = mul(impactSpeed, normal)
+    const impulse = mul(2 * impactSpeed * circle.mass, normal)
     circle.impulse = add(circle.impulse, impulse)
     const shift = mul(overlap, normal)
     circle.shift = add(circle.shift, shift)
@@ -189,6 +197,7 @@ export class World {
 export interface WorldSummary {
   agents: AgentSummary[]
   blades: BladeSummary[]
+  stars: StarSummary[]
   walls: number[][][]
   boundary: number[][]
 }
