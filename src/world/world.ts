@@ -170,7 +170,7 @@ export class World {
       const overlap = circle.radius - dot(ac, normal)
       if (overlap < 0) continue
       const impactSpeed = -dot(circle.velocity, normal)
-      const impulse = mul(2 * impactSpeed * circle.mass, normal)
+      const impulse = mul(1.2 * impactSpeed * circle.mass, normal)
       circle.impulse = add(circle.impulse, impulse)
       const shift = mul(overlap, normal)
       circle.shift = add(circle.shift, shift)
@@ -183,7 +183,7 @@ export class World {
     if (overlap <= 0) return false
     const normal = dirFromTo(point, circle.position)
     const impactSpeed = -dot(circle.velocity, normal)
-    const impulse = mul(2 * impactSpeed * circle.mass, normal)
+    const impulse = mul(1.2 * impactSpeed * circle.mass, normal)
     circle.impulse = add(circle.impulse, impulse)
     const shift = mul(overlap, normal)
     circle.shift = add(circle.shift, shift)
