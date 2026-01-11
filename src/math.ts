@@ -115,6 +115,14 @@ export function clampVec (vector: number[], maxLength: number): number[] {
   return mul(maxLength, direction)
 }
 
+export function cross (v: number[], w: number[]): number {
+  return v[0] * w[1] - v[1] * w[0]
+}
+
+export function randomDir (): number[] {
+  return angleToDir(2 * Math.PI * Math.random())
+}
+
 // export function getAngleDiff (toAngle: number, fromAngle: number): number {
 //   const v = { x: Math.cos(fromAngle), y: Math.sin(fromAngle) }
 //   const w = { x: Math.cos(toAngle), y: Math.sin(toAngle) }
@@ -125,10 +133,6 @@ export function clampVec (vector: number[], maxLength: number): number[] {
 //   const x = vector.x * Math.cos(angle) - vector.y * Math.sin(angle)
 //   const y = vector.x * Math.sin(angle) + vector.y * Math.cos(angle)
 //   return new Vec2(x, y)
-// }
-
-// export function randomDir (): Vec2 {
-//   return rotate(new Vec2(1, 0), 2 * Math.PI * Math.random())
 // }
 
 // export function round (x: number, digits: number): number {

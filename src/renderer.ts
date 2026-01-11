@@ -3,7 +3,7 @@ import { Agent, AgentSummary } from './entities/agent/agent'
 import { Blade, BladeSummary } from './entities/blade'
 import { Circle } from './entities/circle'
 import { Star, StarSummary } from './entities/star'
-import { combine, dirFromTo, getDistance, pi, range } from './math'
+import { combine, dirFromTo, getDistance, pi, range, whichMin } from './math'
 import { WorldSummary } from './world/world'
 
 export class Renderer {
@@ -12,9 +12,9 @@ export class Renderer {
   context: CanvasRenderingContext2D
   summary: WorldSummary
   renderScale = 1
-  backgroundColor = 'hsl(0,0%,0%)'
-  wallColor = 'hsl(0,0%,10%)'
-  transportColor = 'hsla(0, 0%, 5%, 1.00)'
+  floorColor = 'hsl(0,0%,0%)'
+  wallColor = 'hsl(0,0%,4%)'
+  transportColor = 'hsl(0, 0%, 10%)'
   starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
     'hsla(180, 50%, 25%, 1.0)',
@@ -56,7 +56,7 @@ export class Renderer {
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
     this.resetContext()
     this.context.imageSmoothingEnabled = false
-    this.context.fillStyle = this.backgroundColor
+    this.context.fillStyle = this.floorColor
     this.context.beginPath()
     boundary.forEach((vertex, i) => {
       if (i === 0) this.context.moveTo(vertex[0], vertex[1])
@@ -173,6 +173,16 @@ export class Renderer {
     this.context.beginPath()
     this.context.arc(agent.position[0], agent.position[1], Agent.radius, 0, 2 * Math.PI)
     this.context.fill()
+
+    this.context.strokeStyle = 'red'
+    this.context.lineWidth = 0.1
+    if (agent.rayPoints.length === 0) return
+    const distances = agent.rayPoints.map(point => getDistance(point, agent.position))
+    const rayPoint = agent.rayPoints[whichMin(distances)]
+    this.context.beginPath()
+    this.context.moveTo(agent.position[0], agent.position[1])
+    this.context.lineTo(rayPoint[0], rayPoint[1])
+    this.context.stroke()
   }
 
   followPlayer (): void {

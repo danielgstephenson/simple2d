@@ -2,6 +2,7 @@ import { Agent } from '../entities/agent/agent'
 import { Player } from '../entities/agent/player'
 import { Star } from '../entities/star'
 import { getDistance } from '../math'
+import { raycastWall } from '../raycast'
 import { World } from './world'
 
 export class TestCavern extends World {
@@ -52,5 +53,10 @@ export class TestCavern extends World {
     if (this.player.dead) {
       this.player.respawn()
     }
+    this.player.rayPoints = raycastWall(this.player.position, this.player.rayDir, this.boundary)
+    this.walls.forEach(wall => {
+      const intersections = raycastWall(this.player.position, this.player.rayDir, wall)
+      if (intersections.length > 0) this.player.rayPoints.push(...intersections)
+    })
   }
 }
