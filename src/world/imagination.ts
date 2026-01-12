@@ -8,13 +8,13 @@ export class Imagination extends World {
   timeStep = 0.02
   stepCount = 10
 
-  constructor () {
+  constructor() {
     super()
-    this.agent0 = this.addAgent([-3, 0])
-    this.agent1 = this.addAgent([+3, 0])
+    this.agent0 = this.addPlayer([-3, 0])
+    this.agent1 = this.addGuard([+3, 0])
   }
 
-  getOutcomes (state: number[]): number[][] {
+  getOutcomes(state: number[]): number[][] {
     const state0 = range(0, 7).map(i => state[i])
     const state1 = range(8, 15).map(i => state[i])
     const outcomes: number[][] = []

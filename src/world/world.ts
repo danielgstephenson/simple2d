@@ -1,10 +1,11 @@
 import { actionVectors } from '../actionVectors'
-import { Agent, AgentSummary } from '../entities/agent/agent'
+import { Agent } from '../entities/agent/agent'
 import { Guard } from '../entities/agent/guard'
 import { Player } from '../entities/agent/player'
-import { Blade, BladeSummary } from '../entities/blade'
+import { Blade } from '../entities/blade'
 import { Circle } from '../entities/circle'
-import { Star, StarSummary } from '../entities/star'
+import { Star } from '../entities/star'
+import { Transporter } from '../entities/transporter'
 import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
 
 export class World {
@@ -12,60 +13,53 @@ export class World {
   blades: Blade[] = []
   stars: Star[] = []
   circles: Circle[] = []
+  transporters: Transporter[] = []
   walls: number[][][] = []
   boundary: number[][] = [] // This is the outer boundary
-  summary: WorldSummary
   timeStep = 0.04
   timeScale = 1
   paused = false
 
-  constructor () {
-    this.summary = this.summarize()
-  }
-
-  begin (): void {
+  begin(): void {
     setInterval(() => this.step(), 1000 * this.timeStep / this.timeScale)
   }
 
-  addAgent (position: number[]): Agent {
-    const agent = new Agent(this, position)
-    return agent
-  }
-
-  addPlayer (position: number[]): Player {
+  addPlayer(position: number[]): Player {
     const player = new Player(this, position)
     return player
   }
 
-  addGuard (position: number[]): Guard {
+  addGuard(position: number[]): Guard {
     const guard = new Guard(this, position)
     return guard
   }
 
-  addBlade (position: number[]): Blade {
+  addGuardBlade(position: number[]): Blade {
     const blade = new Blade(this, position)
+    blade.align = 2
     return blade
   }
 
-  addStar (position: number[]): Star {
+  addPlayerBlade(position: number[]): Blade {
+    const blade = new Blade(this, position)
+    blade.align = 1
+    return blade
+  }
+
+  addStar(position: number[]): Star {
     const star = new Star(this, position)
     return star
   }
 
-  summarize (): WorldSummary {
-    return {
-      boundary: this.boundary,
-      walls: this.walls,
-      agents: this.agents.map(c => c.summarize()),
-      blades: this.blades.map(b => b.summarize()),
-      stars: this.stars.map(s => s.summarize())
-    }
+  addTransporter(position: number[]): Transporter {
+    const transporter = new Transporter(this, position)
+    return transporter
   }
 
-  preStep (): void {}
-  postStep (): void {}
+  preStep(): void { }
+  postStep(): void { }
 
-  step (): void {
+  step(): void {
     if (this.paused) return
     this.preStep()
     const dt = this.timeStep
@@ -128,7 +122,7 @@ export class World {
     this.postStep()
   }
 
-  collideCircleCircle (circle1: Circle, circle2: Circle): boolean {
+  collideCircleCircle(circle1: Circle, circle2: Circle): boolean {
     const distance = getDistance(circle1.position, circle2.position)
     const overlap = circle1.radius + circle2.radius - distance
     if (overlap <= 0) return false
@@ -145,7 +139,7 @@ export class World {
     return true
   }
 
-  collideCircleWall (circle: Circle, wall: number[][]): void {
+  collideCircleWall(circle: Circle, wall: number[][]): void {
     for (const point of wall) {
       if (this.collideCirclePoint(circle, point)) {
         return
@@ -177,7 +171,7 @@ export class World {
     }
   }
 
-  collideCirclePoint (circle: Circle, point: number[]): boolean {
+  collideCirclePoint(circle: Circle, point: number[]): boolean {
     const distance = getDistance(circle.position, point)
     const overlap = circle.radius - distance
     if (overlap <= 0) return false
@@ -190,7 +184,7 @@ export class World {
     return true
   }
 
-  checkBlades (agent: Agent): void {
+  checkBlades(agent: Agent): void {
     if (agent.dead) return
     this.blades.forEach(blade => {
       if (agent.dead) return
@@ -204,12 +198,4 @@ export class World {
       agent.die()
     })
   }
-}
-
-export interface WorldSummary {
-  agents: AgentSummary[]
-  blades: BladeSummary[]
-  stars: StarSummary[]
-  walls: number[][][]
-  boundary: number[][]
 }

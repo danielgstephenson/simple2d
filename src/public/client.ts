@@ -1,9 +1,9 @@
 import { io } from 'socket.io-client'
 import { Renderer } from '../renderer'
-import { WorldSummary } from '../world/world'
 import { Input } from '../input'
 import { dot, getLength, whichMax } from '../math'
 import { actionVectors } from '../actionVectors'
+import { LevelSummary } from '../world/level'
 
 const renderer = new Renderer()
 const input = new Input()
@@ -15,7 +15,7 @@ socket.on('connect', () => {
 socket.on('renderScale', (renderScale: number) => {
   renderer.renderScale = renderScale
 })
-socket.on('summary', (summary: WorldSummary) => {
+socket.on('summary', (summary: LevelSummary) => {
   renderer.summary = summary
 })
 
@@ -23,7 +23,7 @@ window.addEventListener('keydown', (event: KeyboardEvent) => {
   if (!event.repeat) socket.emit('unpause')
 })
 
-function sendAction (): void {
+function sendAction(): void {
   renderer.camera.updateScale(input.zoom)
   let x = 0
   let y = 0
