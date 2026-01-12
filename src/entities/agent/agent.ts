@@ -1,4 +1,3 @@
-import { randomDir } from '../../math'
 import { World } from '../../world/world'
 import { Blade } from '../blade'
 import { Circle } from '../circle'
@@ -17,8 +16,6 @@ export class Agent extends Circle {
   dead = false
   align = 0
   index: number
-  rayDir = randomDir()
-  rayPoints: number[][] = []
 
   constructor (world: World, position = [0, 0]) {
     super(world, position, Agent.radius)
@@ -54,8 +51,7 @@ export class Agent extends Circle {
       history: this.history,
       align: this.align,
       dead: this.dead,
-      blade: this.blade == null ? undefined : this.blade.index,
-      rayPoints: this.rayPoints
+      blade: this.blade == null ? undefined : this.blade.index
     }
   }
 }
@@ -66,5 +62,4 @@ export interface AgentSummary {
   align: number
   dead: boolean
   blade?: number
-  rayPoints: number[][]
 }

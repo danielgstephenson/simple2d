@@ -3,7 +3,7 @@ import { Agent, AgentSummary } from './entities/agent/agent'
 import { Blade, BladeSummary } from './entities/blade'
 import { Circle } from './entities/circle'
 import { Star, StarSummary } from './entities/star'
-import { combine, dirFromTo, getDistance, pi, range, whichMin } from './math'
+import { combine, dirFromTo, getDistance, pi, range } from './math'
 import { WorldSummary } from './world/world'
 
 export class Renderer {
@@ -176,13 +176,6 @@ export class Renderer {
 
     this.context.strokeStyle = 'red'
     this.context.lineWidth = 0.1
-    if (agent.rayPoints.length === 0) return
-    const distances = agent.rayPoints.map(point => getDistance(point, agent.position))
-    const rayPoint = agent.rayPoints[whichMin(distances)]
-    this.context.beginPath()
-    this.context.moveTo(agent.position[0], agent.position[1])
-    this.context.lineTo(rayPoint[0], rayPoint[1])
-    this.context.stroke()
   }
 
   followPlayer (): void {

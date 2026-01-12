@@ -123,6 +123,18 @@ export function randomDir (): number[] {
   return angleToDir(2 * Math.PI * Math.random())
 }
 
+export function sortBy<T> (array: T[], priorities: number[]): T[] {
+  const pairs: Array<[T, number]> = array.map((x, i) => [x, priorities[i]])
+  pairs.sort((a, b) => a[1] - b[1])
+  const sorted = pairs.map(pair => pair[0])
+  return sorted
+}
+
+export function shuffle<T> (array: T[]): T[] {
+  const priorities = array.map(x => Math.random())
+  return sortBy(array, priorities)
+}
+
 // export function getAngleDiff (toAngle: number, fromAngle: number): number {
 //   const v = { x: Math.cos(fromAngle), y: Math.sin(fromAngle) }
 //   const w = { x: Math.cos(toAngle), y: Math.sin(toAngle) }

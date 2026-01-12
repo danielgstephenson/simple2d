@@ -1,16 +1,17 @@
 import { Agent } from '../entities/agent/agent'
 import { Player } from '../entities/agent/player'
 import { Star } from '../entities/star'
-import { getDistance } from '../math'
-import { raycastWall } from '../raycast'
+import { getDistance, range } from '../math'
 import { World } from './world'
 
-export class TestCavern extends World {
+export class Level extends World {
   player: Player
   timeScale = 1.4
   timeStep = 0.02
+  floorPoints: number[][] = []
+  floor: number[][][] = []
 
-  constructor () {
+  constructor() {
     super()
     this.player = this.addPlayer([-3, 0])
     this.player.align = 1
@@ -28,21 +29,33 @@ export class TestCavern extends World {
     ]
     this.walls.push([
       [5, 5],
-      [5, 10],
-      [10, 10]
+      [5, 18],
+      [18, 18]
     ])
     this.summary = this.summarize()
     this.begin()
   }
 
-  postStep (): void {
+  setupFloor(): void {
+    const xBoundary = this.boundary.map(point => point[0])
+    const yBoundary = this.boundary.map(point => point[1])
+    const xMax = Math.max(...xBoundary)
+    const xMin = Math.min(...xBoundary)
+    const yMax = Math.max(...yBoundary)
+    const yMin = Math.min(...yBoundary)
+    for (const _ of range(1000)) {
+      
+    }
+  }
+
+  postStep(): void {
     this.summary = this.summarize()
     if (this.player.dead) {
       this.paused = true
     }
   }
 
-  preStep (): void {
+  preStep(): void {
     this.stars.forEach(star => {
       if (star.agent != null) return
       if (this.player.star != null) return
@@ -53,10 +66,5 @@ export class TestCavern extends World {
     if (this.player.dead) {
       this.player.respawn()
     }
-    this.player.rayPoints = raycastWall(this.player.position, this.player.rayDir, this.boundary)
-    this.walls.forEach(wall => {
-      const intersections = raycastWall(this.player.position, this.player.rayDir, wall)
-      if (intersections.length > 0) this.player.rayPoints.push(...intersections)
-    })
   }
 }
