@@ -13,26 +13,26 @@ export class Blade extends Circle {
   align = 0
   index: number
 
-  constructor (world: World, position = [0, 0]) {
+  constructor(world: World, position = [0, 0]) {
     super(world, position, Blade.radius)
     this.index = this.world.blades.length
     this.world.blades.push(this)
   }
 
-  attach (agent: Agent): void {
+  attach(agent: Agent): void {
     agent.blade = this
     this.agent = agent
     this.align = agent.align
   }
 
-  detach (): void {
+  detach(): void {
     if (this.agent != null) {
       this.agent.blade = undefined
       this.agent = undefined
     }
   }
 
-  summarize (): BladeSummary {
+  summarize(): BladeSummary {
     return {
       position: this.position,
       history: this.history,

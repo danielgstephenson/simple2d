@@ -34,13 +34,13 @@ export class World {
     return guard
   }
 
-  addGuardBlade(position: number[]): Blade {
+  addPlayerBlade(position: number[]): Blade {
     const blade = new Blade(this, position)
-    blade.align = 2
+    blade.align = 0
     return blade
   }
 
-  addPlayerBlade(position: number[]): Blade {
+  addGuardBlade(position: number[]): Blade {
     const blade = new Blade(this, position)
     blade.align = 1
     return blade
@@ -191,11 +191,12 @@ export class World {
       const distance = getDistance(agent.position, blade.position)
       const overlap = agent.radius + blade.radius - distance
       if (overlap < 0) return
-      if (blade.align === 0 || blade.align === agent.align) {
+      if (blade.align === agent.align) {
         if (agent.blade == null && blade.agent == null) blade.attach(agent)
         return
       }
       agent.die()
+      return
     })
   }
 }

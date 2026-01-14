@@ -7,8 +7,7 @@ export class Messenger {
   io: SocketIoServer
   level: Level
 
-  constructor (server: Server) {
-    console.log('messenger')
+  constructor(server: Server) {
     this.io = new SocketIoServer(server.httpServer)
     this.server = server
     this.level = new Level()
@@ -18,10 +17,11 @@ export class Messenger {
     // console.log(JSON.stringify(svgObject, null, 2))
   }
 
-  setupIo (): void {
+  setupIo(): void {
     this.io.on('connection', socket => {
       console.log(socket.id, 'connected')
       socket.emit('renderScale', this.server.config.renderScale)
+      socket.emit('layout', this.level.layout())
       socket.on('action', (action: number) => {
         if (this.level.agents.length > 0) {
           this.level.agents[0].action = action
@@ -36,7 +36,7 @@ export class Messenger {
     })
   }
 
-  update (): void {
+  update(): void {
     this.io.emit('summary', this.level.summary)
   }
 }

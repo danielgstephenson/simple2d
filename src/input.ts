@@ -8,7 +8,7 @@ export class Input {
   minZoom = -30
   zoom = 0
 
-  constructor () {
+  constructor() {
     window.addEventListener('keydown', (event: KeyboardEvent) => this.onkeydown(event))
     window.addEventListener('keyup', (event: KeyboardEvent) => this.onkeyup(event))
     window.addEventListener('wheel', (event: WheelEvent) => this.onwheel(event))
@@ -27,57 +27,57 @@ export class Input {
     // window.ontouchmove = (event: TouchEvent) => this.ontouchmove(event)
     // window.ontouchstart = (event: TouchEvent) => this.ontouchstart(event)
     // window.ontouchend = (event: TouchEvent) => this.ontouchend(event)
-    window.oncontextmenu = () => {}
+    window.oncontextmenu = () => { }
   }
 
-  onkeydown (event: KeyboardEvent): void {
+  onkeydown(event: KeyboardEvent): void {
     this.keyboard.set(event.code, true)
   }
 
-  onkeyup (event: KeyboardEvent): void {
+  onkeyup(event: KeyboardEvent): void {
     this.keyboard.set(event.code, false)
   }
 
-  isKeyDown (key: string): boolean {
+  isKeyDown(key: string): boolean {
     return this.keyboard.get(key) ?? false
   }
 
-  onwheel (event: WheelEvent): void {
+  onwheel(event: WheelEvent): void {
     const change = -0.002 * event.deltaY
     this.zoom = clamp(this.minZoom, this.maxZoom, this.zoom + change)
   }
 
-  onmousemove (event: MouseEvent): void {
+  onmousemove(event: MouseEvent): void {
     this.mousePosition[0] = event.clientX - 0.5 * window.innerWidth
     this.mousePosition[1] = 0.5 * window.innerHeight - event.clientY
   }
 
-  onmousedown (event: MouseEvent): void {
+  onmousedown(event: MouseEvent): void {
     this.mouseButtons.set(event.button, true)
     this.mousePosition[0] = event.clientX - 0.5 * window.innerWidth
     this.mousePosition[1] = 0.5 * window.innerHeight - event.clientY
   }
 
-  onmouseup (event: MouseEvent): void {
+  onmouseup(event: MouseEvent): void {
     this.mouseButtons.set(event.button, false)
   }
 
-  ontouchmove (event: TouchEvent): void {
+  ontouchmove(event: TouchEvent): void {
     this.mousePosition[0] = event.touches[0].clientX - 0.5 * window.innerWidth
     this.mousePosition[1] = 0.5 * window.innerHeight - event.touches[0].clientY
   }
 
-  ontouchstart (event: TouchEvent): void {
+  ontouchstart(event: TouchEvent): void {
     this.mouseButtons.set(0, true)
     this.mousePosition[0] = event.touches[0].clientX - 0.5 * window.innerWidth
     this.mousePosition[1] = 0.5 * window.innerHeight - event.touches[0].clientY
   }
 
-  ontouchend (event: TouchEvent): void {
+  ontouchend(_: TouchEvent): void {
     this.mouseButtons.set(0, false)
   }
 
-  isMouseButtonDown (button: number): boolean {
+  isMouseButtonDown(button: number): boolean {
     return this.mouseButtons.get(button) ?? false
   }
 }

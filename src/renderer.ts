@@ -5,38 +5,39 @@ import { Circle } from './entities/circle'
 import { Star, StarSummary } from './entities/star'
 import { Transporter, TransporterSummary } from './entities/transporter'
 import { angleToDir, combine, dirFromTo, getDistance, pi, range } from './math'
-import { LevelSummary } from './world/level'
+import { Layout, LevelSummary } from './world/level'
 
 export class Renderer {
   camera = new Camera()
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
   summary: LevelSummary
+  layout: Layout
   renderScale = 1
-  floorColor = 'hsl(0,0%,0%)'
-  wallColor = 'hsl(0,0%,4%)'
-  transportColor = 'hsl(0, 0%, 10%)'
+  floorColor = 'hsl(0,0%,6%)'
+  wallColor = 'hsl(0,0%,0%)'
+  transportColor = 'hsl(0, 0%, 30%)'
   starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
-    'hsla(180, 50%, 25%, 1.0)',
-    'hsla(220, 100%, 45%, 1.0)',
-    'hsla(120, 100%, 30%, 1.0)']
-
+    'hsl(220, 100%, 50%)',
+    'hsl(120, 100%, 35%)'
+  ]
   bladeColors = [
-    'hsla(180, 40%, 20%, 0.5)',
-    'hsla(220, 80%, 40%, 0.5)',
-    'hsla(120, 100%, 25%, 0.5)']
+    'hsl(220, 100%, 30%)',
+    'hsl(120, 100%, 20%)']
 
   constructor() {
     this.summary = {
-      boundary: [],
-      walls: [],
       blades: [],
       agents: [],
       stars: [],
+    }
+    this.layout = {
+      boundary: [],
+      walls: [],
       transporters: [],
       floorPoints: [],
-      floorEdges: []
+      floorRands: []
     }
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
@@ -47,14 +48,14 @@ export class Renderer {
     window.requestAnimationFrame(() => this.draw())
     this.setupCanvas()
     this.followPlayer()
-    this.drawBoundary(this.summary.boundary)
-    this.summary.transporters.forEach(transporter => this.drawTransporter(transporter))
-    this.summary.walls.forEach(w => this.drawWall(w))
+    this.drawBoundary(this.layout.boundary)
+    this.drawFloor(this.layout)
+    this.layout.transporters.forEach(transporter => this.drawTransporter(transporter))
+    this.layout.walls.forEach(w => this.drawWall(w))
     this.summary.blades.forEach(blade => this.drawSpring(blade))
     this.summary.blades.forEach(blade => this.drawBlade(blade))
     this.summary.agents.forEach(agent => this.drawAgent(agent))
     this.summary.stars.forEach(star => this.drawStar(star))
-    this.drawFloor(this.summary)
   }
 
   drawBoundary(boundary: number[][]): void {
@@ -95,16 +96,24 @@ export class Renderer {
     this.context.stroke()
   }
 
-  drawFloor(summary: LevelSummary): void {
+  drawFloor(layout: Layout): void {
     this.context.strokeStyle = this.transportColor
     this.context.lineCap = 'round'
     this.context.lineWidth = 0.03
-    this.context.beginPath()
-    summary.floorEdges.forEach(edge => {
-      this.context.moveTo(edge[0][0], edge[0][1])
-      this.context.lineTo(edge[1][0], edge[1][1])
+    layout.floorPoints.forEach((point, i) => {
+      const rand = layout.floorRands[i]
+      const lightness = 4 + 4 * rand
+      const x = point[0]
+      const y = point[1]
+      const radius = 3
+      const gradient = this.context.createRadialGradient(x, y, 0, x, y, radius)
+      gradient.addColorStop(0, `hsla(0,0%,${lightness}%,0.5)`)
+      gradient.addColorStop(1, `hsla(0,0%,${lightness}%,0)`)
+      this.context.fillStyle = gradient
+      this.context.beginPath()
+      this.context.arc(x, y, radius, 0, 2 * Math.PI)
+      this.context.fill()
     })
-    this.context.stroke()
   }
 
   drawWall(wall: number[][]): void {
@@ -138,7 +147,6 @@ export class Renderer {
       const y1 = origin[1] + Math.sin(angle1) * Star.radius * 0.45
       this.context.lineTo(x1, y1)
     })
-    // this.context.arc(star.spawnPoint[0], star.spawnPoint[1], Star.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
@@ -162,37 +170,38 @@ export class Renderer {
   drawBlade(blade: BladeSummary): void {
     this.resetContext()
     const L = Circle.historyLength
+    this.context.fillStyle = this.bladeColors[blade.align]
+    this.context.globalCompositeOperation = 'lighten'
     blade.history.forEach((position, i) => {
-      const a = 0.01 * (L - i) / L
-      this.context.fillStyle = `hsla(0, 0%, 50%, ${a})`
+      this.context.globalAlpha = 0.1 * (L - i) / L
       this.context.beginPath()
       this.context.arc(position[0], position[1], Blade.radius, 0, 2 * Math.PI)
       this.context.fill()
     })
-    this.context.fillStyle = this.bladeColors[blade.align]
+    this.context.globalCompositeOperation = 'source-over'
+    this.context.globalAlpha = 1
     this.context.beginPath()
     this.context.arc(blade.position[0], blade.position[1], Blade.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
   drawAgent(agent: AgentSummary): void {
-    if (agent.dead && agent.align !== 1) return
+    if (agent.dead && agent.align !== 0) return
     this.resetContext()
     const L = Circle.historyLength
+    this.context.fillStyle = this.agentColors[agent.align]
+    this.context.globalCompositeOperation = 'lighten'
     agent.history.forEach((position, i) => {
-      const a = 0.02 * (L - i) / L
-      this.context.fillStyle = `hsla(0, 0%, 50%, ${a})`
+      this.context.globalAlpha = 0.05 * (L - i) / L
       this.context.beginPath()
       this.context.arc(position[0], position[1], Agent.radius, 0, 2 * Math.PI)
       this.context.fill()
     })
-    this.context.fillStyle = this.agentColors[agent.align]
+    this.context.globalCompositeOperation = 'source-over'
+    this.context.globalAlpha = 1
     this.context.beginPath()
     this.context.arc(agent.position[0], agent.position[1], Agent.radius, 0, 2 * Math.PI)
     this.context.fill()
-
-    this.context.strokeStyle = 'red'
-    this.context.lineWidth = 0.1
   }
 
   followPlayer(): void {
@@ -201,6 +210,7 @@ export class Renderer {
       return
     }
     this.camera.position = this.summary.agents[0].position
+    console.log('this.summary.agents[0].align', this.summary.agents[0].align)
   }
 
   setupCanvas(): void {

@@ -4,7 +4,7 @@ import { Star } from '../star'
 
 export class Player extends Agent {
   static radius = 0.5
-  align = 1
+  align = 0
 
   constructor (world: World, position = [0, 0]) {
     super(world, position)

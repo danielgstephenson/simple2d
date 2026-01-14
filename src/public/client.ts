@@ -3,7 +3,7 @@ import { Renderer } from '../renderer'
 import { Input } from '../input'
 import { dot, getLength, whichMax } from '../math'
 import { actionVectors } from '../actionVectors'
-import { LevelSummary } from '../world/level'
+import { Layout, LevelSummary } from '../world/level'
 
 const renderer = new Renderer()
 const input = new Input()
@@ -17,6 +17,9 @@ socket.on('renderScale', (renderScale: number) => {
 })
 socket.on('summary', (summary: LevelSummary) => {
   renderer.summary = summary
+})
+socket.on('layout', (layout: Layout) => {
+  renderer.layout = layout
 })
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {

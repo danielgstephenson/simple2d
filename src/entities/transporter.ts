@@ -2,7 +2,7 @@ import { angleToDir, combine, pi, range } from '../math'
 import { World } from '../world/world'
 
 export class Transporter {
-  static radius = 5
+  static radius = 4
   world: World
   center = [0, 0]
   shell: number[][]

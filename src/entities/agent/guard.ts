@@ -3,13 +3,13 @@ import { Agent } from './agent'
 
 export class Guard extends Agent {
   static radius = 0.5
-  align = 2
+  align = 1
 
-  constructor (world: World, position = [0, 0]) {
+  constructor(world: World, position = [0, 0]) {
     super(world, position)
   }
 
-  die (): void {
+  die(): void {
     super.die()
     if (this.blade != null) this.blade.detach()
     if (this.star != null) this.star.reset()
