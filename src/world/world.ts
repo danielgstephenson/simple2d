@@ -4,6 +4,7 @@ import { Guard } from '../entities/agent/guard'
 import { Player } from '../entities/agent/player'
 import { Blade } from '../entities/blade'
 import { Circle } from '../entities/circle'
+import { Door } from '../entities/door'
 import { Star } from '../entities/star'
 import { Transporter } from '../entities/transporter'
 import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
@@ -14,6 +15,7 @@ export class World {
   stars: Star[] = []
   circles: Circle[] = []
   transporters: Transporter[] = []
+  doors: Door[] = []
   walls: number[][][] = []
   boundary: number[][] = [] // This is the outer boundary
   timeStep = 0.04
@@ -44,6 +46,11 @@ export class World {
     const blade = new Blade(this, position)
     blade.align = 1
     return blade
+  }
+
+  addDoor(vector: number[], shell: number[][]): Door {
+    const door = new Door(this, vector, shell)
+    return door
   }
 
   addStar(position: number[]): Star {
@@ -106,6 +113,9 @@ export class World {
       this.collideCircleWall(circle, this.boundary)
       this.walls.forEach(wall => {
         this.collideCircleWall(circle, wall)
+      })
+      this.doors.forEach(door => {
+        this.collideCircleWall(circle, door.shell)
       })
     })
     this.circles.forEach(circle => {

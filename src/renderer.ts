@@ -2,6 +2,7 @@ import { Camera } from './camera'
 import { Agent, AgentSummary } from './entities/agent/agent'
 import { Blade, BladeSummary } from './entities/blade'
 import { Circle } from './entities/circle'
+import { DoorSummary } from './entities/door'
 import { Star, StarSummary } from './entities/star'
 import { Transporter, TransporterSummary } from './entities/transporter'
 import { angleToDir, combine, dirFromTo, getDistance, pi, range } from './math'
@@ -17,6 +18,7 @@ export class Renderer {
   floorColor = 'hsl(0,0%,6%)'
   wallColor = 'hsl(0,0%,0%)'
   transportColor = 'hsl(0, 0%, 30%)'
+  doorColor = 'hsl(36, 100%, 7%)'
   starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
     'hsl(220, 100%, 50%)',
@@ -31,6 +33,7 @@ export class Renderer {
       blades: [],
       agents: [],
       stars: [],
+      doors: []
     }
     this.layout = {
       boundary: [],
@@ -52,6 +55,7 @@ export class Renderer {
     this.drawFloor(this.layout)
     this.layout.transporters.forEach(transporter => this.drawTransporter(transporter))
     this.layout.walls.forEach(w => this.drawWall(w))
+    this.summary.doors.forEach(door => this.drawDoor(door))
     this.summary.blades.forEach(blade => this.drawSpring(blade))
     this.summary.blades.forEach(blade => this.drawBlade(blade))
     this.summary.agents.forEach(agent => this.drawAgent(agent))
@@ -123,6 +127,20 @@ export class Renderer {
     this.context.beginPath()
     this.context.beginPath()
     wall.forEach((point, i) => {
+      if (i === 0) this.context.moveTo(point[0], point[1])
+      else this.context.lineTo(point[0], point[1])
+    })
+    this.context.fill()
+  }
+
+  drawDoor(door: DoorSummary): void {
+    const shell = door.shell
+    this.resetContext()
+    this.context.fillStyle = this.doorColor
+    this.context.lineWidth = 0.1
+    this.context.beginPath()
+    this.context.beginPath()
+    shell.forEach((point, i) => {
       if (i === 0) this.context.moveTo(point[0], point[1])
       else this.context.lineTo(point[0], point[1])
     })

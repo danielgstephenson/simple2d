@@ -1,6 +1,7 @@
 import { Agent, AgentSummary } from '../entities/agent/agent'
 import { Player } from '../entities/agent/player'
 import { BladeSummary } from '../entities/blade'
+import { DoorSummary } from '../entities/door'
 import { Floor } from '../entities/floor'
 import { Star, StarSummary } from '../entities/star'
 import { TransporterSummary } from '../entities/transporter'
@@ -34,6 +35,12 @@ export class Level extends World {
       [5, 18],
       [18, 18]
     ])
+    this.addDoor([0, -5], [
+      [-10, 10],
+      [-10, 13],
+      [-14, 13],
+      [-14, 10]
+    ])
     this.floor = new Floor(this)
     this.summary = this.summarize()
     this.begin()
@@ -64,6 +71,7 @@ export class Level extends World {
       agents: this.agents.map(c => c.summarize()),
       blades: this.blades.map(b => b.summarize()),
       stars: this.stars.map(s => s.summarize()),
+      doors: this.doors.map(d => d.summarize())
     }
   }
 
@@ -82,6 +90,7 @@ export interface LevelSummary {
   agents: AgentSummary[]
   blades: BladeSummary[]
   stars: StarSummary[]
+  doors: DoorSummary[]
 }
 
 export interface Layout {
