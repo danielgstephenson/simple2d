@@ -6,18 +6,19 @@ export class Player extends Agent {
   static radius = 0.5
   align = 0
 
-  constructor (world: World, position = [0, 0]) {
+  constructor(world: World, position = [0, 0]) {
     super(world, position)
+    world.players.push(this)
   }
 
-  takeStar (star: Star): void {
+  takeStar(star: Star): void {
     if (this.star != null) return
     if (star.agent != null) return
     this.star = star
     star.agent = this
   }
 
-  respawn (): void {
+  respawn(): void {
     this.dead = false
     this.position = this.spawnPoint
     this.velocity = [0, 0]

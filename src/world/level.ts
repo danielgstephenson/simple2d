@@ -1,11 +1,10 @@
-import { Agent, AgentSummary } from '../entities/agent/agent'
+import { AgentSummary } from '../entities/agent/agent'
 import { Player } from '../entities/agent/player'
 import { BladeSummary } from '../entities/blade'
 import { DoorSummary } from '../entities/door'
 import { Floor } from '../entities/floor'
-import { Star, StarSummary } from '../entities/star'
+import { StarSummary } from '../entities/star'
 import { TransporterSummary } from '../entities/transporter'
-import { getDistance } from '../math'
 import { World } from './world'
 
 export class Level extends World {
@@ -50,19 +49,6 @@ export class Level extends World {
     this.summary = this.summarize()
     if (this.player.dead) {
       this.paused = true
-    }
-  }
-
-  preStep(): void {
-    this.stars.forEach(star => {
-      if (star.agent != null) return
-      if (this.player.star != null) return
-      const distance = getDistance(this.player.position, star.spawnPoint)
-      if (distance > Star.radius + Agent.radius) return
-      this.player.takeStar(star)
-    })
-    if (this.player.dead) {
-      this.player.respawn()
     }
   }
 

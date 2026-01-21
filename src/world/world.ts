@@ -11,13 +11,15 @@ import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, ra
 
 export class World {
   agents: Agent[] = []
+  players: Player[] = []
+  guards: Guard[] = []
   blades: Blade[] = []
   stars: Star[] = []
   circles: Circle[] = []
-  transporters: Transporter[] = []
   doors: Door[] = []
   walls: number[][][] = []
-  boundary: number[][] = [] // This is the outer boundary
+  boundary: number[][] = []
+  transporters: Transporter[] = []
   timeStep = 0.04
   timeScale = 1
   paused = false
@@ -70,6 +72,19 @@ export class World {
     if (this.paused) return
     this.preStep()
     const dt = this.timeStep
+    this.players.forEach(player => {
+      this.stars.forEach(star => {
+        if (star.agent != null) return
+        if (star.door != null) return
+        if (player.star != null) return
+        const distance = getDistance(player.position, star.spawnPoint)
+        if (distance > Star.radius + Agent.radius) return
+        player.takeStar(star)
+      })
+      if (player.dead) {
+        player.respawn()
+      }
+    })
     this.agents.forEach(agent => {
       agent.force = [0, 0]
       agent.impulse = [0, 0]
@@ -115,7 +130,8 @@ export class World {
         this.collideCircleWall(circle, wall)
       })
       this.doors.forEach(door => {
-        this.collideCircleWall(circle, door.shell)
+        const hit = this.collideCircleWall(circle, door.shell)
+        if (hit && circle instanceof Player) door.knock(circle)
       })
     })
     this.circles.forEach(circle => {
@@ -149,10 +165,10 @@ export class World {
     return true
   }
 
-  collideCircleWall(circle: Circle, wall: number[][]): void {
+  collideCircleWall(circle: Circle, wall: number[][]): boolean {
     for (const point of wall) {
       if (this.collideCirclePoint(circle, point)) {
-        return
+        return true
       }
     }
     for (const i of range(wall.length)) {
@@ -178,7 +194,9 @@ export class World {
       circle.impulse = add(circle.impulse, impulse)
       const shift = mul(overlap, normal)
       circle.shift = add(circle.shift, shift)
+      return true
     }
+    return false
   }
 
   collideCirclePoint(circle: Circle, point: number[]): boolean {

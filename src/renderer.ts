@@ -151,9 +151,13 @@ export class Renderer {
     this.resetContext()
     this.context.fillStyle = this.starColor
     this.context.beginPath()
-    const origin = star.agent == null
-      ? star.spawnPoint
-      : this.summary.agents[star.agent].position
+    let origin = star.spawnPoint
+    if (star.agent != null) {
+      origin = this.summary.agents[star.agent].position
+    }
+    if (star.door != null) {
+      origin = this.summary.doors[star.door].center
+    }
     range(5).forEach(i => {
       const angle0 = (0.5 + 0.4 * i) * pi
       const x0 = origin[0] + Math.cos(angle0) * Star.radius
@@ -228,7 +232,6 @@ export class Renderer {
       return
     }
     this.camera.position = this.summary.agents[0].position
-    console.log('this.summary.agents[0].align', this.summary.agents[0].align)
   }
 
   setupCanvas(): void {
