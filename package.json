@@ -5,10 +5,9 @@
   "author": "",
   "scripts": {
     "prebuild": "rimraf dist",
-    "copy-svgs": "copyfiles --up 1 \"src/**/*.svg\" dist/",
     "copy-resources": "copyfiles --up 1 \"src/resources/**/*\" dist/",
     "build:server": "npx tsc -build ./src",
-    "build:client": "npx parcel build ./src/public/client.html --dist-dir \"dist/public\"",
+    "build:client": "npx parcel build ./src/public/index.html --dist-dir \"dist/public\"",
     "build": "npm run prebuild && npm run build:server && npm run build:client && npm run copy-resources",
     "start": "node ./dist",
     "dev": "npm run build && npm run start"

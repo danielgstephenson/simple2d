@@ -5,32 +5,32 @@ export const twoPi = 2 * pi
 export const X = 0
 export const Y = 1
 
-export function range (a: number, b?: number): number[] {
+export function range(a: number, b?: number): number[] {
   if (b == null) return range(0, a - 1)
   return [...Array(b - a + 1).keys()].map(i => a + i)
 }
 
-export function sample<T> (options: T[]): T {
+export function sample<T>(options: T[]): T {
   return options[Math.floor(Math.random() * options.length)]
 }
 
-export function sum (array: number[]): number {
+export function sum(array: number[]): number {
   let total = 0
   array.forEach(x => { total = total + x })
   return total
 }
 
-export function mean (array: number[]): number {
+export function mean(array: number[]): number {
   if (array.length === 0) return 0
   return sum(array) / array.length
 }
 
-export function average (array: number[]): number {
+export function average(array: number[]): number {
   if (array.length === 0) return 0
   return sum(array) / array.length
 }
 
-export function dot (x: number[], y: number[]): number {
+export function dot(x: number[], y: number[]): number {
   if (x.length !== y.length) {
     throw new Error('x and y must have the same length')
   }
@@ -38,60 +38,60 @@ export function dot (x: number[], y: number[]): number {
   return sum(products)
 }
 
-export function clamp (a: number, b: number, x: number): number {
+export function clamp(a: number, b: number, x: number): number {
   return Math.max(a, Math.min(x, b))
 }
 
-export function vecToAngle (vector: number[]): number {
+export function vecToAngle(vector: number[]): number {
   const x = vector[0]
   const y = vector[1]
   return Math.atan2(y, x)
 }
 
-export function angleToDir (angle: number): number[] {
+export function angleToDir(angle: number): number[] {
   return [Math.cos(angle), Math.sin(angle)]
 }
 
-export function sub (a: number[], b: number[]): number[] {
+export function sub(a: number[], b: number[]): number[] {
   return range(a.length).map(i => a[i] - b[i])
 }
 
-export function add (a: number[], b: number[]): number[] {
+export function add(a: number[], b: number[]): number[] {
   return range(a.length).map(i => a[i] + b[i])
 }
 
-export function combine (a: number, v: number[], b: number, w: number[]): number[] {
+export function combine(a: number, v: number[], b: number, w: number[]): number[] {
   return add(mul(a, v), mul(b, w))
 }
 
-export function mul (a: number, v: number[]): number[] {
+export function mul(a: number, v: number[]): number[] {
   return v.map(x => a * x)
 }
 
-export function getLength (v: number[]): number {
+export function getLength(v: number[]): number {
   const squares = v.map(x => x ** 2)
   return Math.sqrt(sum(squares))
 }
 
-export function getDistance (v: number[], w: number[]): number {
+export function getDistance(v: number[], w: number[]): number {
   return getLength(sub(v, w))
 }
 
-export function normalize (v: number[]): number[] {
+export function normalize(v: number[]): number[] {
   const length = getLength(v)
   if (length === 0) return [0, 0]
   return mul(1 / length, v)
 }
 
-export function dirToFrom (to: number[], from: number[]): number[] {
+export function dirToFrom(to: number[], from: number[]): number[] {
   return normalize(sub(from, to))
 }
 
-export function dirFromTo (from: number[], to: number[]): number[] {
+export function dirFromTo(from: number[], to: number[]): number[] {
   return normalize(sub(to, from))
 }
 
-export function whichMax (array: number[]): number {
+export function whichMax(array: number[]): number {
   let indexMax = 0
   let valueMax = array[0]
   array.forEach((value, index) => {
@@ -103,35 +103,35 @@ export function whichMax (array: number[]): number {
   return indexMax
 }
 
-export function whichMin (array: number[]): number {
+export function whichMin(array: number[]): number {
   const negArray = array.map(x => -x)
   return whichMax(negArray)
 }
 
-export function clampVec (vector: number[], maxLength: number): number[] {
+export function clampVec(vector: number[], maxLength: number): number[] {
   const length = getLength(vector)
   if (length < maxLength) return vector
   const direction = normalize(vector)
   return mul(maxLength, direction)
 }
 
-export function cross (v: number[], w: number[]): number {
+export function cross(v: number[], w: number[]): number {
   return v[0] * w[1] - v[1] * w[0]
 }
 
-export function randomDir (): number[] {
+export function randomDir(): number[] {
   return angleToDir(2 * Math.PI * Math.random())
 }
 
-export function sortBy<T> (array: T[], priorities: number[]): T[] {
+export function sortBy<T>(array: T[], priorities: number[]): T[] {
   const pairs: Array<[T, number]> = array.map((x, i) => [x, priorities[i]])
   pairs.sort((a, b) => a[1] - b[1])
   const sorted = pairs.map(pair => pair[0])
   return sorted
 }
 
-export function shuffle<T> (array: T[]): T[] {
-  const priorities = array.map(x => Math.random())
+export function shuffle<T>(array: T[]): T[] {
+  const priorities = array.map(_ => Math.random())
   return sortBy(array, priorities)
 }
 
