@@ -72,19 +72,6 @@ export class World {
     if (this.paused) return
     this.preStep()
     const dt = this.timeStep
-    this.players.forEach(player => {
-      this.stars.forEach(star => {
-        if (star.agent != null) return
-        if (star.door != null) return
-        if (player.star != null) return
-        const distance = getDistance(player.position, star.spawnPoint)
-        if (distance > Star.radius + Agent.radius) return
-        player.takeStar(star)
-      })
-      if (player.dead) {
-        player.respawn()
-      }
-    })
     this.agents.forEach(agent => {
       agent.force = [0, 0]
       agent.impulse = [0, 0]
@@ -104,6 +91,19 @@ export class World {
         const vector = sub(blade.agent.position, blade.position)
         const clampedVector = clampVec(vector, 10)
         blade.force = mul(blade.movePower, clampedVector)
+      }
+    })
+    this.players.forEach(player => {
+      this.stars.forEach(star => {
+        if (star.agent != null) return
+        if (star.door != null) return
+        if (player.star != null) return
+        const distance = getDistance(player.position, star.spawnPoint)
+        if (distance > Star.radius + Agent.radius) return
+        player.takeStar(star)
+      })
+      if (player.dead) {
+        player.respawn()
       }
     })
     this.agents.forEach(agent => {

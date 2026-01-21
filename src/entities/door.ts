@@ -27,7 +27,6 @@ export class Door {
   }
 
   knock(player: Player): void {
-    console.log('knock')
     if (this.star != null) return
     if (player.star == null) return
     this.star = player.star
