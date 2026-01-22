@@ -9,7 +9,7 @@ import { World } from './world'
 
 export class Level extends World {
   player: Player
-  timeScale = 1.4
+  timeScale = 1
   timeStep = 0.02
   floor: Floor
   summary: LevelSummary

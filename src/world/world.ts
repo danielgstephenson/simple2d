@@ -1,3 +1,4 @@
+import NanoTimer from 'nanotimer'
 import { actionVectors } from '../actionVectors'
 import { Agent } from '../entities/agent/agent'
 import { Guard } from '../entities/agent/guard'
@@ -10,6 +11,7 @@ import { Transporter } from '../entities/transporter'
 import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
 
 export class World {
+  timer = new NanoTimer()
   agents: Agent[] = []
   players: Player[] = []
   guards: Guard[] = []
@@ -25,7 +27,7 @@ export class World {
   paused = false
 
   begin(): void {
-    setInterval(() => this.step(), 1000 * this.timeStep / this.timeScale)
+    this.timer.setInterval(() => this.step(), '', `${this.timeStep / this.timeScale}s`)
   }
 
   addPlayer(position: number[]): Player {
@@ -93,6 +95,7 @@ export class World {
         blade.force = mul(blade.movePower, clampedVector)
       }
     })
+    this.doors.forEach(door => { door.onStep(dt) })
     this.players.forEach(player => {
       this.stars.forEach(star => {
         if (star.agent != null) return
@@ -166,9 +169,10 @@ export class World {
   }
 
   collideCircleWall(circle: Circle, wall: number[][]): boolean {
+    let hit = false
     for (const point of wall) {
       if (this.collideCirclePoint(circle, point)) {
-        return true
+        hit = true
       }
     }
     for (const i of range(wall.length)) {
@@ -194,9 +198,9 @@ export class World {
       circle.impulse = add(circle.impulse, impulse)
       const shift = mul(overlap, normal)
       circle.shift = add(circle.shift, shift)
-      return true
+      hit = true
     }
-    return false
+    return hit
   }
 
   collideCirclePoint(circle: Circle, point: number[]): boolean {
