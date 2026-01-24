@@ -6,6 +6,7 @@ import { Star } from "./star"
 export class Door {
   spawnShell: number[][]
   shell: number[][]
+  knots: number[][] = []
   spawnCenter: number[]
   center: number[]
   openCenter: number[]
@@ -27,6 +28,19 @@ export class Door {
     this.center = [mean(xs), mean(ys)]
     this.spawnCenter = structuredClone(this.center)
     this.openCenter = add(this.spawnCenter, vector)
+    const xMax = Math.max(...xs)
+    const xMin = Math.min(...xs)
+    const yMax = Math.max(...ys)
+    const yMin = Math.min(...ys)
+    const xRange = xMax - xMin
+    const yRange = yMax - yMin
+    const count = Math.ceil(xRange * yRange / 5)
+    for (const _ of range(count)) {
+      const x = xMin + xRange * Math.random()
+      const y = yMin + yRange * Math.random()
+      const knot = [x, y]
+      this.knots.push(knot)
+    }
   }
 
   onStep(dt: number): void {

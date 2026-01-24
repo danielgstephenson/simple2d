@@ -8,6 +8,7 @@ import { Transporter, TransporterSummary } from './entities/transporter'
 import { angleToDir, combine, dirFromTo, getDistance, pi, range } from './math'
 import { Layout, LevelSummary } from './world/level'
 
+
 export class Renderer {
   camera = new Camera()
   canvas: HTMLCanvasElement
@@ -17,16 +18,16 @@ export class Renderer {
   renderScale = 1
   floorColor = 'hsl(0,0%,6%)'
   wallColor = 'hsl(0,0%,0%)'
-  transportColor = 'hsl(0, 0%, 30%)'
-  doorColor = 'hsl(36, 100%, 7%)'
+  transportColor = 'hsla(0, 0%, 100%, 0.3)'
+  doorColor = 'hsl(36, 100%, 6%)'
   starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
     'hsl(220, 100%, 50%)',
     'hsl(120, 100%, 35%)'
   ]
   bladeColors = [
-    'hsl(220, 100%, 30%)',
-    'hsl(120, 100%, 20%)']
+    'hsl(220, 100%, 25%)',
+    'hsl(120, 100%, 15%)']
 
   constructor() {
     this.summary = {
@@ -39,8 +40,7 @@ export class Renderer {
       boundary: [],
       walls: [],
       transporters: [],
-      floorPoints: [],
-      floorRands: []
+      floorPoints: []
     }
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
@@ -49,6 +49,7 @@ export class Renderer {
 
   draw(): void {
     window.requestAnimationFrame(() => this.draw())
+    this.context.save()
     this.setupCanvas()
     this.followPlayer()
     this.drawBoundary(this.layout.boundary)
@@ -60,6 +61,7 @@ export class Renderer {
     this.summary.blades.forEach(blade => this.drawBlade(blade))
     this.summary.agents.forEach(agent => this.drawAgent(agent))
     this.summary.stars.forEach(star => this.drawStar(star))
+    this.context.restore()
   }
 
   drawBoundary(boundary: number[][]): void {
@@ -74,7 +76,6 @@ export class Renderer {
       else this.context.lineTo(vertex[0], vertex[1])
     })
     this.context.fill()
-    this.context.save()
     this.context.clip()
   }
 
@@ -104,12 +105,11 @@ export class Renderer {
     this.context.strokeStyle = this.transportColor
     this.context.lineCap = 'round'
     this.context.lineWidth = 0.03
-    layout.floorPoints.forEach((point, i) => {
-      const rand = layout.floorRands[i]
-      const lightness = 4 + 4 * rand
+    layout.floorPoints.forEach((point) => {
+      const lightness = 4
       const x = point[0]
       const y = point[1]
-      const radius = 3
+      const radius = 4
       const gradient = this.context.createRadialGradient(x, y, 0, x, y, radius)
       gradient.addColorStop(0, `hsla(0,0%,${lightness}%,0.5)`)
       gradient.addColorStop(1, `hsla(0,0%,${lightness}%,0)`)
@@ -139,10 +139,13 @@ export class Renderer {
     this.context.fillStyle = this.doorColor
     this.context.lineWidth = 0.1
     this.context.beginPath()
-    this.context.beginPath()
+    const xs: number[] = []
+    const ys: number[] = []
     shell.forEach((point, i) => {
       if (i === 0) this.context.moveTo(point[0], point[1])
       else this.context.lineTo(point[0], point[1])
+      xs.push(point[0])
+      ys.push(point[1])
     })
     this.context.fill()
   }

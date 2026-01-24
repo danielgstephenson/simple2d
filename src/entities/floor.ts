@@ -3,7 +3,6 @@ import { Level } from '../world/level'
 
 export class Floor {
   points: number[][] = []
-  rands: number[] = []
 
   constructor(level: Level) {
     const xBoundary = level.boundary.map(point => point[0])
@@ -20,7 +19,6 @@ export class Floor {
       const y = yMin + yRange * Math.random()
       const point = [x, y]
       this.points.push(point)
-      this.rands.push(Math.random())
     }
   }
 }

@@ -66,8 +66,7 @@ export class Level extends World {
       boundary: this.boundary,
       walls: this.walls,
       transporters: this.transporters.map(t => t.summarize()),
-      floorPoints: this.floor.points,
-      floorRands: this.floor.rands
+      floorPoints: this.floor.points
     }
   }
 }
@@ -84,5 +83,4 @@ export interface Layout {
   walls: number[][][]
   transporters: TransporterSummary[]
   floorPoints: number[][]
-  floorRands: number[]
 }

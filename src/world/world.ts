@@ -170,11 +170,6 @@ export class World {
 
   collideCircleWall(circle: Circle, wall: number[][]): boolean {
     let hit = false
-    for (const point of wall) {
-      if (this.collideCirclePoint(circle, point)) {
-        hit = true
-      }
-    }
     for (const i of range(wall.length)) {
       const j = i > 0 ? i - 1 : wall.length - 1
       const a = wall[i]
@@ -199,6 +194,12 @@ export class World {
       const shift = mul(overlap, normal)
       circle.shift = add(circle.shift, shift)
       hit = true
+    }
+    if (hit) return hit
+    for (const point of wall) {
+      if (this.collideCirclePoint(circle, point)) {
+        hit = true
+      }
     }
     return hit
   }
