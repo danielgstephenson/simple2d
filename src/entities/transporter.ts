@@ -6,7 +6,7 @@ export class Transporter {
   static radius = 4
   world: World
   charge = 0
-  interval = 3
+  interval = 5
   center: number[]
   target: number[]
   shell: number[][]

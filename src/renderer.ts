@@ -80,6 +80,7 @@ export class Renderer {
   }
 
   drawTransporter(transporter: TransporterSummary): void {
+    this.resetContext()
     this.context.strokeStyle = this.transportColor
     this.context.lineCap = 'round'
     this.context.lineWidth = 0.05
