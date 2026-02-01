@@ -8,7 +8,7 @@ import { Circle } from '../entities/circle'
 import { Door } from '../entities/door'
 import { Star } from '../entities/star'
 import { Transporter } from '../entities/transporter'
-import { add, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
+import { add, clamp, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
 
 export class World {
   timer = new NanoTimer()
@@ -62,8 +62,8 @@ export class World {
     return star
   }
 
-  addTransporter(position: number[]): Transporter {
-    const transporter = new Transporter(this, position)
+  addTransporter(position: number[], target: number[]): Transporter {
+    const transporter = new Transporter(this, position, target)
     return transporter
   }
 
@@ -96,6 +96,19 @@ export class World {
       }
     })
     this.doors.forEach(door => { door.onStep(dt) })
+    this.transporters.forEach(transporter => {
+      let chargeRate = -1
+      this.players.forEach(player => {
+        const distance = getDistance(player.position, transporter.center)
+        if (distance > 1) return
+        if (transporter.charge === transporter.interval) {
+          transporter.transport(player)
+          return
+        }
+        chargeRate = 1
+      })
+      transporter.charge = clamp(0, transporter.interval, transporter.charge + chargeRate * dt)
+    })
     this.players.forEach(player => {
       this.stars.forEach(star => {
         if (star.agent != null) return

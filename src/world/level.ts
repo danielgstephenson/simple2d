@@ -22,17 +22,17 @@ export class Level extends World {
     this.addGuard([-10, 0])
     this.addGuardBlade([-10, 0])
     this.addStar([0, -10])
-    this.addTransporter([0, -1])
+    this.addTransporter([4, 4], [13, 13])
     this.boundary = [
       [-10, -30],
-      [10, -20],
+      [10, -10],
       [25, 25],
       [-25, 15]
     ]
     this.walls.push([
-      [5, 5],
-      [5, 18],
-      [18, 18]
+      [30, -10],
+      [-30, 40],
+      [10, 10]
     ])
     this.addDoor([0, -5], [
       [-10, 10],
@@ -57,7 +57,8 @@ export class Level extends World {
       agents: this.agents.map(c => c.summarize()),
       blades: this.blades.map(b => b.summarize()),
       stars: this.stars.map(s => s.summarize()),
-      doors: this.doors.map(d => d.summarize())
+      doors: this.doors.map(d => d.summarize()),
+      transporters: this.transporters.map(t => t.summarize())
     }
   }
 
@@ -65,7 +66,6 @@ export class Level extends World {
     return {
       boundary: this.boundary,
       walls: this.walls,
-      transporters: this.transporters.map(t => t.summarize()),
       floorPoints: this.floor.points
     }
   }
@@ -76,11 +76,11 @@ export interface LevelSummary {
   blades: BladeSummary[]
   stars: StarSummary[]
   doors: DoorSummary[]
+  transporters: TransporterSummary[]
 }
 
 export interface Layout {
   boundary: number[][]
   walls: number[][][]
-  transporters: TransporterSummary[]
   floorPoints: number[][]
 }

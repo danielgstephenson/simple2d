@@ -5,42 +5,59 @@ import { dot, getLength, whichMax } from '../math'
 import { actionVectors } from '../actionVectors'
 import { Layout, LevelSummary } from '../world/level'
 
-const renderer = new Renderer()
-const input = new Input()
+export class Client {
+  renderer = new Renderer()
+  input = new Input()
+  socket = io()
+  token = 0
 
-const socket = io()
-socket.on('connect', () => {
-  console.log('connect')
-})
-socket.on('renderScale', (renderScale: number) => {
-  renderer.renderScale = renderScale
-})
-socket.on('summary', (summary: LevelSummary) => {
-  renderer.summary = summary
-})
-socket.on('layout', (layout: Layout) => {
-  renderer.layout = layout
-})
-
-window.addEventListener('keydown', (event: KeyboardEvent) => {
-  if (!event.repeat) socket.emit('unpause')
-})
-
-function sendAction(): void {
-  renderer.camera.updateScale(input.zoom)
-  let x = 0
-  let y = 0
-  if (input.isKeyDown('KeyW') || input.isKeyDown('ArrowUp')) y += 1
-  if (input.isKeyDown('KeyS') || input.isKeyDown('ArrowDown')) y -= 1
-  if (input.isKeyDown('KeyA') || input.isKeyDown('ArrowLeft')) x -= 1
-  if (input.isKeyDown('KeyD') || input.isKeyDown('ArrowRight')) x += 1
-  const vector = [x, y]
-  if (getLength(vector) === 0) {
-    socket.emit('action', 0)
-    return
+  constructor() {
+    window.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (!event.repeat) this.socket.emit('unpause')
+    })
+    this.setupIo()
+    setInterval(() => this.sendAction(), 20)
   }
-  const dots = actionVectors.map(dir => dot(dir, vector))
-  const action = whichMax(dots)
-  socket.emit('action', action)
+
+  setupIo() {
+    this.socket.on('connect', () => {
+      console.log('connect')
+    })
+    this.socket.on('token', (token: number) => {
+      if (this.token !== 0 && this.token !== token) {
+        console.log('reload', this.token, token)
+        location.reload()
+        return
+      }
+      this.token = token
+    })
+    this.socket.on('renderScale', (renderScale: number) => {
+      this.renderer.renderScale = renderScale
+    })
+    this.socket.on('summary', (summary: LevelSummary) => {
+      this.renderer.summary = summary
+    })
+    this.socket.on('layout', (layout: Layout) => {
+      this.renderer.layout = layout
+    })
+  }
+
+  sendAction(): void {
+    this.renderer.camera.updateScale(this.input.zoom)
+    let x = 0
+    let y = 0
+    if (this.input.isKeyDown('KeyW') || this.input.isKeyDown('ArrowUp')) y += 1
+    if (this.input.isKeyDown('KeyS') || this.input.isKeyDown('ArrowDown')) y -= 1
+    if (this.input.isKeyDown('KeyA') || this.input.isKeyDown('ArrowLeft')) x -= 1
+    if (this.input.isKeyDown('KeyD') || this.input.isKeyDown('ArrowRight')) x += 1
+    const vector = [x, y]
+    if (getLength(vector) === 0) {
+      this.socket.emit('action', 0)
+      return
+    }
+    const dots = actionVectors.map(dir => dot(dir, vector))
+    const action = whichMax(dots)
+    this.socket.emit('action', action)
+  }
 }
-setInterval(sendAction, 20)
+

@@ -34,12 +34,12 @@ export class Renderer {
       blades: [],
       agents: [],
       stars: [],
-      doors: []
+      doors: [],
+      transporters: []
     }
     this.layout = {
       boundary: [],
       walls: [],
-      transporters: [],
       floorPoints: []
     }
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
@@ -54,13 +54,13 @@ export class Renderer {
     this.followPlayer()
     this.drawBoundary(this.layout.boundary)
     this.drawFloor(this.layout)
-    this.layout.transporters.forEach(transporter => this.drawTransporter(transporter))
-    this.layout.walls.forEach(w => this.drawWall(w))
+    this.summary.transporters.forEach(transporter => this.drawTransporter(transporter))
     this.summary.doors.forEach(door => this.drawDoor(door))
     this.summary.blades.forEach(blade => this.drawSpring(blade))
     this.summary.blades.forEach(blade => this.drawBlade(blade))
     this.summary.agents.forEach(agent => this.drawAgent(agent))
     this.summary.stars.forEach(star => this.drawStar(star))
+    this.layout.walls.forEach(w => this.drawWall(w))
     this.context.restore()
   }
 
@@ -98,6 +98,16 @@ export class Renderer {
         this.context.lineTo(b[0], b[1])
       }
     }
+    this.context.stroke()
+    if (transporter.charge === 0) return
+    this.context.strokeStyle = this.transportColor
+    this.context.lineWidth = 0.5
+    this.context.globalAlpha = 0.25
+    const radius = Transporter.radius + 0.5
+    const start = Math.PI * (0.5 - 2 * transporter.charge / transporter.interval)
+    const stop = 0.5 * Math.PI
+    this.context.beginPath()
+    this.context.arc(x, y, radius, start, stop)
     this.context.stroke()
   }
 

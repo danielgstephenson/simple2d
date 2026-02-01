@@ -6,6 +6,7 @@ export class Messenger {
   server: Server
   io: SocketIoServer
   level: Level
+  token = Math.random()
 
   constructor(server: Server) {
     this.io = new SocketIoServer(server.httpServer)
@@ -20,6 +21,7 @@ export class Messenger {
   setupIo(): void {
     this.io.on('connection', socket => {
       console.log(socket.id, 'connected')
+      socket.emit('token', this.token)
       socket.emit('renderScale', this.server.config.renderScale)
       socket.emit('layout', this.level.layout())
       socket.on('action', (action: number) => {
