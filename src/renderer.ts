@@ -82,7 +82,7 @@ export class Renderer {
   drawTransporter(transporter: TransporterSummary): void {
     this.context.strokeStyle = this.transportColor
     this.context.lineCap = 'round'
-    this.context.lineWidth = 0.03
+    this.context.lineWidth = 0.05
     const shell = range(8).map(i => {
       const angle = i / 8 * 2 * pi
       const dir = angleToDir(angle)
@@ -148,6 +148,24 @@ export class Renderer {
       ys.push(point[1])
     })
     this.context.fill()
+    this.context.strokeStyle = this.starColor
+    this.context.lineWidth = 0.05
+    this.context.beginPath()
+    const origin = door.center
+    const radius = Star.radius + this.context.lineWidth
+    range(5).forEach(i => {
+      const angle0 = (0.5 + 0.4 * i) * pi
+      const x0 = origin[0] + Math.cos(angle0) * radius
+      const y0 = origin[1] + Math.sin(angle0) * radius
+      if (i === 0) this.context.moveTo(x0, y0)
+      else this.context.lineTo(x0, y0)
+      const angle1 = angle0 + 0.2 * pi
+      const x1 = origin[0] + Math.cos(angle1) * radius * 0.45
+      const y1 = origin[1] + Math.sin(angle1) * radius * 0.45
+      this.context.lineTo(x1, y1)
+    })
+    this.context.closePath()
+    this.context.stroke()
   }
 
   drawStar(star: StarSummary): void {
