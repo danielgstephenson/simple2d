@@ -5,45 +5,23 @@ import { DoorSummary } from '../entities/door'
 import { Floor } from '../entities/floor'
 import { StarSummary } from '../entities/star'
 import { TransporterSummary } from '../entities/transporter'
+import { getChildById, getCircleCenter, getPathPoints, parseSvg } from '../svg'
 import { World } from './world'
 
 export class Level extends World {
   player: Player
-  timeScale = 1
-  timeStep = 0.02
   floor: Floor
   summary: LevelSummary
 
   constructor() {
     super()
-    this.player = this.addPlayer([-3, 0])
-    this.boundary = [
-      [-10, -30],
-      [10, -10],
-      [25, 35],
-      [-25, 20]
-    ]
-    this.walls.push([
-      [30, -10],
-      [-30, 40],
-      [10, 10]
-    ])
-    this.addDoor([0, -5], [
-      [-10, 10],
-      [-10, 13],
-      [-14, 13],
-      [-14, 10]
-    ])
-    this.addTransporter([4, 4], [13, 13])
-    this.addTransporter([2, 23], [-3, 13])
-    this.addPlayerBlade([0, 10])
-    this.addGuard([10, 0])
-    this.addGuard([-10, 0])
-    this.addGuardBlade([-10, 0])
-    this.addStar([0, -10])
+    const svgObject = parseSvg('test.svg')
+    const layer1 = getChildById(svgObject, 'layer1')
+    // console.log(JSON.stringify(layer1, null, 2))
+    this.player = this.addPlayer(getCircleCenter(getChildById(layer1, 'player')))
+    this.boundary = getPathPoints(getChildById(layer1, 'boundary'))
     this.floor = new Floor(this)
     this.summary = this.summarize()
-    this.begin()
   }
 
   postStep(): void {

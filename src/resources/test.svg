@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="297mm"
-   height="210mm"
-   viewBox="0 0 297 210"
+   width="10"
+   height="10"
+   viewBox="0 0 10 10"
    version="1.1"
    id="svg1"
    inkscape:version="1.4 (86a8ad7, 2024-10-11)"
@@ -18,33 +18,54 @@
      pagecolor="#000000"
      bordercolor="#999999"
      borderopacity="1"
-     inkscape:showpageshadow="2"
+     inkscape:showpageshadow="false"
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#262626"
-     inkscape:document-units="mm"
-     inkscape:zoom="0.71891835"
-     inkscape:cx="396.42889"
-     inkscape:cy="561.25984"
+     inkscape:deskcolor="#000000"
+     inkscape:document-units="px"
+     inkscape:zoom="32.53453"
+     inkscape:cx="-13.969773"
+     inkscape:cy="11.019062"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="1912"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1"
+     showborder="false"
+     showgrid="true"
+     showguides="false">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.10196078"
+       color="#0099e5"
+       opacity="0.10196078"
+       empspacing="1"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
   <defs
      id="defs1" />
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <rect
-       style="fill:#0054ff;fill-opacity:1;stroke:none;stroke-width:5.969;stroke-linejoin:round"
-       id="rect1"
-       width="104.88847"
-       height="63.301113"
-       x="96.055763"
-       y="73.349442"
-       ry="0" />
+    <path
+       id="boundary"
+       style="fill:#1a1a1a;fill-opacity:1;stroke-width:5.969;stroke-linejoin:round"
+       d="M 0.10651667,-4.3381023 3.6926343,-2.5082148 3.3750472,2.4936117 0,5.4663993 -6,6 -8.5082148,13.491785 -4,20 v 8 l -8,7 -9,-3 L -32,23 -36.877344,10.422137 -31,2 -17.067251,3.4590633 -9.6920734,12.431261 -7,4 l 0.4631713,-4.73980046 2.054809,-2.71378914 z"
+       sodipodi:nodetypes="ccccccccccccccccccc" />
+    <circle
+       style="fill:#0053ff;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
+       id="player"
+       cx="1.5"
+       cy="-1.5"
+       r="0.5" />
   </g>
 </svg>

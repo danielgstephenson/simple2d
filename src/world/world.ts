@@ -22,11 +22,13 @@ export class World {
   walls: number[][][] = []
   boundary: number[][] = []
   transporters: Transporter[] = []
-  timeStep = 0.04
+  timeStep = 0.02
   timeScale = 1
+  time = 0
+  busy = false
   paused = false
 
-  begin(): void {
+  constructor() {
     this.timer.setInterval(() => this.step(), '', `${this.timeStep / this.timeScale}s`)
   }
 
@@ -71,9 +73,15 @@ export class World {
   postStep(): void { }
 
   step(): void {
+    if (this.busy) {
+      console.log('busy')
+      return
+    }
     if (this.paused) return
+    this.busy = true
     this.preStep()
     const dt = this.timeStep
+    this.time += dt
     this.agents.forEach(agent => {
       agent.force = [0, 0]
       agent.impulse = [0, 0]
@@ -162,6 +170,7 @@ export class World {
       circle.history = circle.history.slice(0, Circle.historyLength)
     })
     this.postStep()
+    this.busy = false
   }
 
   collideCircleCircle(circle1: Circle, circle2: Circle): boolean {
