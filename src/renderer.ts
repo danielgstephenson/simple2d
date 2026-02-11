@@ -41,7 +41,7 @@ export class Renderer {
       transporters: []
     }
     this.layout = {
-      boundary: [],
+      boundaries: [],
       walls: [],
       floorPoints: []
     }
@@ -55,7 +55,8 @@ export class Renderer {
     this.context.save()
     this.setupCanvas()
     this.followPlayer()
-    this.drawBoundary(this.layout.boundary)
+    // this.drawBoundary(this.layout.boundary)
+    this.drawBoundaries(this.layout)
     this.drawFloor(this.layout)
     this.summary.transporters.forEach(transporter => this.drawTransporter(transporter))
     this.summary.doors.forEach(door => this.drawDoor(door))
@@ -79,6 +80,23 @@ export class Renderer {
     boundary.forEach((vertex, i) => {
       if (i === 0) this.context.moveTo(vertex[0], vertex[1])
       else this.context.lineTo(vertex[0], vertex[1])
+    })
+    this.context.fill()
+    this.context.clip()
+  }
+
+  drawBoundaries(layout: Layout): void {
+    this.resetContext()
+    this.context.fillStyle = this.wallColor
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+    this.context.imageSmoothingEnabled = false
+    this.context.fillStyle = this.floorColor
+    this.context.beginPath()
+    layout.boundaries.forEach(boundary => {
+      boundary.forEach((vertex, i) => {
+        if (i === 0) this.context.moveTo(vertex[0], vertex[1])
+        else this.context.lineTo(vertex[0], vertex[1])
+      })
     })
     this.context.fill()
     this.context.clip()

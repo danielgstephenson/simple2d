@@ -20,7 +20,7 @@ export class World {
   circles: Circle[] = []
   doors: Door[] = []
   walls: number[][][] = []
-  boundary: number[][] = []
+  boundaries: number[][][] = []
   transporters: Transporter[] = []
   timeStep = 0.02
   timeScale = 1
@@ -158,7 +158,9 @@ export class World {
       })
     })
     this.circles.forEach(circle => {
-      this.collideCircleWall(circle, this.boundary)
+      this.boundaries.forEach(boundary => {
+        this.collideCircleWall(circle, boundary)
+      })
       this.walls.forEach(wall => {
         this.collideCircleWall(circle, wall)
       })

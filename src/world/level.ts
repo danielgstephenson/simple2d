@@ -19,7 +19,9 @@ export class Level extends World {
     const svgObject = parseSvg('test.svg')
     const layer1 = getChildById(svgObject, 'layer1')
     this.player = this.addPlayer(getCircleCenter(getChildById(layer1, 'player')))
-    this.boundary = getPathPoints(getChildById(layer1, 'boundary'))
+    getChildrenByRole(layer1, 'boundary').forEach(node => {
+      this.boundaries.push(getPathPoints(node))
+    })
     getChildrenByRole(layer1, 'agent').forEach(node => {
       const position = getCircleCenter(node)
       this.addAgent(position)
@@ -53,7 +55,7 @@ export class Level extends World {
 
   layout(): Layout {
     return {
-      boundary: this.boundary,
+      boundaries: this.boundaries,
       walls: this.walls,
       floorPoints: this.floor.points
     }
@@ -70,7 +72,7 @@ export interface LevelSummary {
 }
 
 export interface Layout {
-  boundary: number[][]
+  boundaries: number[][][]
   walls: number[][][]
   floorPoints: number[][]
 }

@@ -4,12 +4,12 @@ export class TestLevel extends Level {
 
   constructor() {
     super()
-    this.boundary = [
+    this.boundaries.push([
       [-10, -30],
       [10, -10],
       [25, 35],
       [-25, 20]
-    ]
+    ])
     this.walls.push([
       [30, -10],
       [-30, 40],

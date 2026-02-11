@@ -5,8 +5,8 @@ export class Floor {
   points: number[][] = []
 
   constructor(level: Level) {
-    const xBoundary = level.boundary.map(point => point[0])
-    const yBoundary = level.boundary.map(point => point[1])
+    const xBoundary = level.boundaries.flat().map(point => point[0])
+    const yBoundary = level.boundaries.flat().map(point => point[1])
     const xMax = Math.max(...xBoundary)
     const xMin = Math.min(...xBoundary)
     const yMax = Math.max(...yBoundary)
