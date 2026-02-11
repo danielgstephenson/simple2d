@@ -1,6 +1,5 @@
 import { Server } from './server'
 import { Server as SocketIoServer } from 'socket.io'
-import { TestLevel } from './world/testLevel'
 import { Level } from './world/level'
 
 export class Messenger {

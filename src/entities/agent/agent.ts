@@ -14,21 +14,21 @@ export class Agent extends Circle {
   force = [0, 0]
   action = 0
   dead = false
-  align = 0
+  align = 1
   index: number
 
-  constructor (world: World, position = [0, 0]) {
+  constructor(world: World, position = [0, 0]) {
     super(world, position, Agent.radius)
     this.spawnPoint = position
     this.index = world.agents.length
     this.world.agents.push(this)
   }
 
-  die (): void {
+  die(): void {
     this.dead = true
   }
 
-  getState (): number[] {
+  getState(): number[] {
     const ap = this.position
     const av = this.velocity
     const bp = this.blade != null ? this.blade.position : [0, 0]
@@ -36,7 +36,7 @@ export class Agent extends Circle {
     return [...ap, ...av, ...bp, ...bv]
   }
 
-  setState (state: number[]): void {
+  setState(state: number[]): void {
     this.position = [state[0], state[1]]
     this.velocity = [state[2], state[3]]
     if (this.blade != null) {
@@ -45,7 +45,7 @@ export class Agent extends Circle {
     }
   }
 
-  summarize (): AgentSummary {
+  summarize(): AgentSummary {
     return {
       position: this.position,
       history: this.history,

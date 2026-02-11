@@ -1,7 +1,6 @@
 import NanoTimer from 'nanotimer'
 import { actionVectors } from '../actionVectors'
 import { Agent } from '../entities/agent/agent'
-import { Guard } from '../entities/agent/guard'
 import { Player } from '../entities/agent/player'
 import { Blade } from '../entities/blade'
 import { Circle } from '../entities/circle'
@@ -9,12 +8,13 @@ import { Door } from '../entities/door'
 import { Star } from '../entities/star'
 import { Transporter } from '../entities/transporter'
 import { add, clamp, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
+import { Rock } from '../entities/rock'
 
 export class World {
   timer = new NanoTimer()
+  rocks: Rock[] = []
   agents: Agent[] = []
   players: Player[] = []
-  guards: Guard[] = []
   blades: Blade[] = []
   stars: Star[] = []
   circles: Circle[] = []
@@ -37,9 +37,14 @@ export class World {
     return player
   }
 
-  addGuard(position: number[]): Guard {
-    const guard = new Guard(this, position)
-    return guard
+  addAgent(position: number[]): Agent {
+    const agent = new Agent(this, position)
+    return agent
+  }
+
+  addRock(position: number[], radius: number): Rock {
+    const rock = new Rock(this, position, radius)
+    return rock
   }
 
   addPlayerBlade(position: number[]): Blade {
@@ -82,15 +87,10 @@ export class World {
     this.preStep()
     const dt = this.timeStep
     this.time += dt
-    this.agents.forEach(agent => {
-      agent.force = [0, 0]
-      agent.impulse = [0, 0]
-      agent.shift = [0, 0]
-    })
-    this.blades.forEach(blade => {
-      blade.force = [0, 0]
-      blade.impulse = [0, 0]
-      blade.shift = [0, 0]
+    this.circles.forEach(circle => {
+      circle.force = [0, 0]
+      circle.impulse = [0, 0]
+      circle.shift = [0, 0]
     })
     this.agents.forEach(agent => {
       if (agent.dead) return
@@ -140,6 +140,15 @@ export class World {
         if (agent2.dead) return
         if (agent1.index >= agent2.index) return
         this.collideCircleCircle(agent1, agent2)
+      })
+    })
+    this.rocks.forEach(rock => {
+      this.agents.forEach(agent => {
+        if (agent.dead) return
+        this.collideCircleCircle(rock, agent)
+      })
+      this.rocks.forEach(rock2 => {
+        this.collideCircleCircle(rock, rock2)
       })
     })
     this.blades.forEach(blade1 => {

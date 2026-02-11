@@ -3,6 +3,7 @@ import { Agent, AgentSummary } from './entities/agent/agent'
 import { Blade, BladeSummary } from './entities/blade'
 import { Circle } from './entities/circle'
 import { DoorSummary } from './entities/door'
+import { RockSummary } from './entities/rock'
 import { Star, StarSummary } from './entities/star'
 import { Transporter, TransporterSummary } from './entities/transporter'
 import { angleToDir, combine, dirFromTo, getDistance, pi, range } from './math'
@@ -27,10 +28,12 @@ export class Renderer {
   ]
   bladeColors = [
     'hsl(220, 100%, 25%)',
-    'hsl(120, 100%, 15%)']
-
+    'hsl(120, 100%, 15%)'
+  ]
+  rockColor = 'hsl(120, 0%, 50%)'
   constructor() {
     this.summary = {
+      rocks: [],
       blades: [],
       agents: [],
       stars: [],
@@ -58,7 +61,9 @@ export class Renderer {
     this.summary.doors.forEach(door => this.drawDoor(door))
     this.summary.blades.forEach(blade => this.drawSpring(blade))
     this.summary.blades.forEach(blade => this.drawBlade(blade))
+    this.summary.agents.forEach(agent => this.drawAgentTrail(agent))
     this.summary.agents.forEach(agent => this.drawAgent(agent))
+    this.summary.rocks.forEach(rock => this.drawRock(rock))
     this.summary.stars.forEach(star => this.drawStar(star))
     this.layout.walls.forEach(w => this.drawWall(w))
     this.context.restore()
@@ -239,7 +244,7 @@ export class Renderer {
     this.context.fill()
   }
 
-  drawAgent(agent: AgentSummary): void {
+  drawAgentTrail(agent: AgentSummary): void {
     if (agent.dead && agent.align !== 0) return
     this.resetContext()
     const L = Circle.historyLength
@@ -251,10 +256,24 @@ export class Renderer {
       this.context.arc(position[0], position[1], Agent.radius, 0, 2 * Math.PI)
       this.context.fill()
     })
-    this.context.globalCompositeOperation = 'source-over'
+  }
+
+  drawAgent(agent: AgentSummary): void {
+    if (agent.dead && agent.align !== 0) return
+    this.resetContext()
+    this.context.fillStyle = this.agentColors[agent.align]
     this.context.globalAlpha = 1
     this.context.beginPath()
     this.context.arc(agent.position[0], agent.position[1], Agent.radius, 0, 2 * Math.PI)
+    this.context.fill()
+  }
+
+  drawRock(rock: RockSummary): void {
+    this.resetContext()
+    this.context.fillStyle = this.rockColor
+    this.context.globalAlpha = 1
+    this.context.beginPath()
+    this.context.arc(rock.position[0], rock.position[1], rock.radius, 0, 2 * Math.PI)
     this.context.fill()
   }
 
@@ -280,5 +299,6 @@ export class Renderer {
     this.context.scale(this.camera.scale, this.camera.scale)
     this.context.translate(-this.camera.position[0], -this.camera.position[1])
     this.context.globalAlpha = 1
+    this.context.globalCompositeOperation = 'source-over'
   }
 }

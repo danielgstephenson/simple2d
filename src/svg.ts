@@ -18,6 +18,11 @@ export function getChildById(svgNode: INode, id: string): INode {
   throw new Error(`Child ${id} not found`)
 }
 
+export function getChildrenByRole(svgNode: INode, role: string): INode[] {
+  const children = svgNode.children.filter(child => child.attributes.role === role)
+  return children
+}
+
 export function flip(point: number[]): number[] {
   return [point[0], -point[1]]
 }
@@ -34,4 +39,9 @@ export function getCircleCenter(circleNode: INode): number[] {
   const x = Number(circleNode.attributes.cx)
   const y = Number(circleNode.attributes.cy)
   return flip([x, y])
+}
+
+export function getCircleRadius(circleNode: INode): number {
+  const radius = Number(circleNode.attributes.r)
+  return radius
 }

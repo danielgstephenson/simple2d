@@ -24,8 +24,8 @@ export class TestLevel extends Level {
     this.addTransporter([4, 4], [13, 13])
     this.addTransporter([2, 23], [-3, 13])
     this.addPlayerBlade([0, 10])
-    this.addGuard([10, 0])
-    this.addGuard([-10, 0])
+    this.addAgent([10, 0])
+    this.addAgent([-10, 0])
     this.addGuardBlade([-10, 0])
     this.addStar([0, -10])
   }

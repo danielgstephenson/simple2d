@@ -3,9 +3,10 @@ import { Player } from '../entities/agent/player'
 import { BladeSummary } from '../entities/blade'
 import { DoorSummary } from '../entities/door'
 import { Floor } from '../entities/floor'
+import { RockSummary } from '../entities/rock'
 import { StarSummary } from '../entities/star'
 import { TransporterSummary } from '../entities/transporter'
-import { getChildById, getCircleCenter, getPathPoints, parseSvg } from '../svg'
+import { getChildById, getChildrenByRole, getCircleCenter, getCircleRadius, getPathPoints, parseSvg } from '../svg'
 import { World } from './world'
 
 export class Level extends World {
@@ -17,9 +18,17 @@ export class Level extends World {
     super()
     const svgObject = parseSvg('test.svg')
     const layer1 = getChildById(svgObject, 'layer1')
-    // console.log(JSON.stringify(layer1, null, 2))
     this.player = this.addPlayer(getCircleCenter(getChildById(layer1, 'player')))
     this.boundary = getPathPoints(getChildById(layer1, 'boundary'))
+    getChildrenByRole(layer1, 'agent').forEach(node => {
+      const position = getCircleCenter(node)
+      this.addAgent(position)
+    })
+    getChildrenByRole(layer1, 'rock').forEach(node => {
+      const position = getCircleCenter(node)
+      const radius = getCircleRadius(node)
+      this.addRock(position, radius)
+    })
     this.floor = new Floor(this)
     this.summary = this.summarize()
   }
@@ -33,6 +42,7 @@ export class Level extends World {
 
   summarize(): LevelSummary {
     return {
+      rocks: this.rocks.map(c => c.summarize()),
       agents: this.agents.map(c => c.summarize()),
       blades: this.blades.map(b => b.summarize()),
       stars: this.stars.map(s => s.summarize()),
@@ -51,6 +61,7 @@ export class Level extends World {
 }
 
 export interface LevelSummary {
+  rocks: RockSummary[]
   agents: AgentSummary[]
   blades: BladeSummary[]
   stars: StarSummary[]

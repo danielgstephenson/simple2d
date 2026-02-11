@@ -11,7 +11,7 @@ export class Imagination extends World {
   constructor() {
     super()
     this.agent0 = this.addPlayer([-3, 0])
-    this.agent1 = this.addGuard([+3, 0])
+    this.agent1 = this.addAgent([+3, 0])
   }
 
   getOutcomes(state: number[]): number[][] {
