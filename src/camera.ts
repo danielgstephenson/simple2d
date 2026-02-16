@@ -3,6 +3,6 @@ export class Camera {
   scale = 1
 
   updateScale(zoom: number): void {
-    this.scale = 0.05 * Math.exp(0.1 * zoom)
+    this.scale = 0.07 * Math.exp(0.1 * zoom)
   }
 }

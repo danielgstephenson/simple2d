@@ -1,5 +1,5 @@
 import { World } from '../world/world'
-import { Agent } from './agent/agent'
+import { Agent } from './circle/agent'
 import { Door } from './door'
 
 export class Star {

@@ -1,9 +1,9 @@
 import { Camera } from './camera'
-import { Agent, AgentSummary } from './entities/agent/agent'
-import { Blade, BladeSummary } from './entities/blade'
-import { Circle } from './entities/circle'
+import { Agent, AgentSummary } from './entities/circle/agent'
+import { Blade, BladeSummary } from './entities/circle/blade'
+import { Circle } from './entities/circle/circle'
 import { DoorSummary } from './entities/door'
-import { RockSummary } from './entities/rock'
+import { RockSummary } from './entities/circle/rock'
 import { Star, StarSummary } from './entities/star'
 import { Transporter, TransporterSummary } from './entities/transporter'
 import { angleToDir, combine, dirFromTo, getDistance, pi, range } from './math'
@@ -280,10 +280,17 @@ export class Renderer {
     if (agent.dead && agent.align !== 0) return
     this.resetContext()
     this.context.fillStyle = this.agentColors[agent.align]
-    this.context.globalAlpha = 1
     this.context.beginPath()
     this.context.arc(agent.position[0], agent.position[1], Agent.radius, 0, 2 * Math.PI)
     this.context.fill()
+    if (agent.spawnPoint == null) return
+    this.context.strokeStyle = this.agentColors[agent.align]
+    this.context.lineWidth = 0.12
+    this.context.globalAlpha = 0.3
+    this.context.beginPath()
+    this.context.arc(agent.spawnPoint[0], agent.spawnPoint[1], Agent.radius + 0.4, 0, 2 * Math.PI)
+    this.context.stroke()
+
   }
 
   drawRock(rock: RockSummary): void {

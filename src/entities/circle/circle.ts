@@ -1,5 +1,5 @@
-import { pi } from '../math'
-import { World } from '../world/world'
+import { pi } from '../../math'
+import { World } from '../../world/world'
 
 export class Circle {
   static historyLength = 20
@@ -14,7 +14,7 @@ export class Circle {
   shift = [0, 0]
   drag = 0
 
-  constructor (world: World, position = [0, 0], radius = 0.5) {
+  constructor(world: World, position = [0, 0], radius = 0.5) {
     this.world = world
     this.radius = radius
     this.mass = pi * radius ** 2

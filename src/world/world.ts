@@ -1,14 +1,14 @@
 import NanoTimer from 'nanotimer'
 import { actionVectors } from '../actionVectors'
-import { Agent } from '../entities/agent/agent'
-import { Player } from '../entities/agent/player'
-import { Blade } from '../entities/blade'
-import { Circle } from '../entities/circle'
+import { Agent } from '../entities/circle/agent'
+import { Player } from '../entities/circle/player'
+import { Blade } from '../entities/circle/blade'
+import { Circle } from '../entities/circle/circle'
 import { Door } from '../entities/door'
 import { Star } from '../entities/star'
 import { Transporter } from '../entities/transporter'
 import { add, clamp, clampVec, combine, dirFromTo, dot, getDistance, mul, normalize, range, sub, X, Y } from '../math'
-import { Rock } from '../entities/rock'
+import { Rock } from '../entities/circle/rock'
 
 export class World {
   timer = new NanoTimer()

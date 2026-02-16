@@ -23,12 +23,12 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#000000"
      inkscape:document-units="px"
-     inkscape:zoom="7.1329397"
-     inkscape:cx="13.178297"
-     inkscape:cy="40.866741"
+     inkscape:zoom="22.627417"
+     inkscape:cx="-13.435029"
+     inkscape:cy="37.940698"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
@@ -51,7 +51,28 @@
        visible="true" />
   </sodipodi:namedview>
   <defs
-     id="defs1" />
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="ArrowWide"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path1" />
+    </marker>
+  </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
@@ -59,76 +80,69 @@
     <path
        id="boundary"
        style="fill:#1a1a1a;fill-opacity:1;stroke-width:5.969;stroke-linejoin:round"
-       d="M 0.10651667,-4.3381023 3.6926343,-2.5082148 3.3750472,2.4936117 0,5.4663993 -6,6 -8.5082148,13.491785 -4,20 v 8 l -8,7 -9,-3 L -32,23 -36.877344,10.422137 -31,2 -17.067251,3.4590633 -9.6920734,12.431261 -7,4 l 0.4631713,-4.73980046 2.054809,-2.71378914 z"
+       d="M 0.10651667,-4.3381023 3.6926343,-2.5082148 3.3750472,2.4936117 0,5.4663993 -6,6 -8.5082148,13.491785 -4,20 v 8 l -8,7 -9,-3 -11,-9 0.902767,-8.29239 6.75502,-4.7830891 L -17,10 -9.6920734,12.431261 -7,4 l 0.4631713,-4.73980046 2.054809,-2.71378914 z"
        sodipodi:nodetypes="ccccccccccccccccccc"
        role="boundary" />
     <path
        id="boundary-2"
        style="fill:#1a1a1a;fill-opacity:1;stroke-width:5.969;stroke-linejoin:round"
-       d="m -21.509512,33.784822 9.879091,3.554412 3.5035887,19.793201 -9.7329457,15.617907 -13.807648,3.341189 -13.605112,-5.945696 -3.596239,-16.693049 5.354448,-16.224133 10.20637,-3.859119 z"
-       sodipodi:nodetypes="cccccccccc"
+       d="m -22,33 11,4 2.8364311,8.428749 -2.7443851,14.616852 -8.835343,7.153316 -14.798974,3.638587 -16.57909,-8.324879 L -54.221937,44.82825 -48.099132,30.827757 -33,24 Z"
+       sodipodi:nodetypes="ccccccccccc"
        role="boundary" />
     <circle
        style="fill:#808080;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="rock-5-2-7"
+       id="rock-1"
        cx="-10.074648"
-       cy="12.609913"
+       cy="12.763591"
        r="0.39085981"
        role="rock" />
     <circle
        style="fill:#808080;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="rock-5-2-79"
+       id="rock-2"
        cx="-9.0384865"
        cy="13.568329"
        r="0.18933001"
        role="rock" />
     <circle
        style="fill:#808080;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="rock-5-2-79-8"
-       cx="-10.127221"
-       cy="13.391973"
+       id="rock-3"
+       cx="-10.157888"
+       cy="13.453307"
        r="0.27695167"
        role="rock" />
     <circle
        style="fill:#808080;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="rock-5-2-79-2"
-       cx="-8.8106699"
-       cy="13.18933"
+       id="rock-4"
+       cx="-8.8895292"
+       cy="13.154282"
        r="0.23314084"
        role="rock" />
     <circle
        style="fill:#808080;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
        id="rock-5"
-       cx="-8.7554121"
-       cy="14.058583"
+       cx="-8.7072201"
+       cy="14.001629"
        r="0.32952467"
        role="rock" />
     <circle
        style="fill:#808080;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="rock-5-1"
-       cx="-9.4503078"
-       cy="13.057898"
+       id="rock-6"
+       cx="-9.524786"
+       cy="13.307619"
        r="0.32952467"
        role="rock" />
     <circle
        style="fill:#808080;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="rock-5-2"
-       cx="-9.5532837"
-       cy="13.752789"
+       id="rock-7"
+       cx="-9.4637909"
+       cy="13.971843"
        r="0.31200033"
        role="rock" />
     <circle
        style="fill:#00b200;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="agent"
-       cx="-27.279959"
-       cy="5.0427699"
-       r="0.5"
-       role="agent" />
-    <circle
-       style="fill:#00b200;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
-       id="agent-9"
-       cx="-8.7663364"
-       cy="28.261696"
+       id="agent-2"
+       cx="-25"
+       cy="17"
        r="0.5"
        role="agent" />
     <circle
@@ -138,5 +152,24 @@
        cy="-1.5"
        r="0.5"
        role="player" />
+    <g
+       id="transporter1"
+       transform="translate(-12.974386,29.098502)"
+       style="fill:#ffffff;fill-opacity:0.119048"
+       role="transporter">
+      <path
+         style="fill:none;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWide)"
+         d="M 0,0 -3.909411,7.767503"
+         id="arrow1"
+         sodipodi:nodetypes="cc"
+         role="arrow" />
+      <circle
+         style="fill:#ffffff;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         id="circle1"
+         cx="0"
+         cy="0"
+         r="4"
+         role="circle" />
+    </g>
   </g>
 </svg>

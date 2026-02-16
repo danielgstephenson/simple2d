@@ -1,8 +1,16 @@
+@font-face {
+  font-family: 'Lekton-Bold';
+  src: url('../resources/Lekton-Bold.ttf');
+  font-style: bold;
+  font-display: block;
+}
+
 body {
   background-color: hsl(0, 0%, 0%);
   margin: 0;
   overflow: hidden;
 }
+
 #interfaceDiv {
   display: flex;
   flex-direction: row;
@@ -11,6 +19,7 @@ body {
   justify-content: center;
   align-items: center;
 }
+
 #canvas {
   background-color: hsl(0, 0%, 0%);
   position: absolute;

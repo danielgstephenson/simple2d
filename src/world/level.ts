@@ -1,9 +1,9 @@
-import { AgentSummary } from '../entities/agent/agent'
-import { Player } from '../entities/agent/player'
-import { BladeSummary } from '../entities/blade'
+import { AgentSummary } from '../entities/circle/agent'
+import { Player } from '../entities/circle/player'
+import { BladeSummary } from '../entities/circle/blade'
 import { DoorSummary } from '../entities/door'
 import { Floor } from '../entities/floor'
-import { RockSummary } from '../entities/rock'
+import { RockSummary } from '../entities/circle/rock'
 import { StarSummary } from '../entities/star'
 import { TransporterSummary } from '../entities/transporter'
 import { getChildById, getChildrenByRole, getCircleCenter, getCircleRadius, getPathPoints, parseSvg } from '../svg'
@@ -30,6 +30,11 @@ export class Level extends World {
       const position = getCircleCenter(node)
       const radius = getCircleRadius(node)
       this.addRock(position, radius)
+    })
+    getChildrenByRole(layer1, 'transporter').forEach(group => {
+      console.log(group.attributes)
+      const circle = getChildrenByRole(group, 'circle')[0]
+      console.log(circle.attributes)
     })
     this.floor = new Floor(this)
     this.summary = this.summarize()

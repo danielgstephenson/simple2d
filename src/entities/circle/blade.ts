@@ -1,5 +1,5 @@
-import { World } from '../world/world'
-import { Agent } from './agent/agent'
+import { World } from '../../world/world'
+import { Agent } from './agent'
 import { Circle } from './circle'
 
 export class Blade extends Circle {

@@ -1,5 +1,5 @@
 import { World } from '../../world/world'
-import { Agent } from './agent'
+import { Agent, AgentSummary } from './agent'
 import { Star } from '../star'
 
 export class Player extends Agent {
@@ -9,6 +9,12 @@ export class Player extends Agent {
   constructor(world: World, position = [0, 0]) {
     super(world, position)
     world.players.push(this)
+  }
+
+  summarize(): AgentSummary {
+    const summary = super.summarize()
+    summary.spawnPoint = this.spawnPoint
+    return summary
   }
 
   takeStar(star: Star): void {

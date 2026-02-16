@@ -1,6 +1,6 @@
 import { World } from '../../world/world'
-import { Blade } from '../blade'
-import { Circle } from '../circle'
+import { Blade } from './blade'
+import { Circle } from './circle'
 import { Star } from '../star'
 
 export class Agent extends Circle {
@@ -57,6 +57,7 @@ export class Agent extends Circle {
 }
 
 export interface AgentSummary {
+  spawnPoint?: number[]
   position: number[]
   history: number[][]
   align: number

@@ -1,6 +1,6 @@
 import { add, clamp, combine, mean, range, sub } from "../math"
 import { World } from "../world/world"
-import { Player } from "./agent/player"
+import { Player } from "./circle/player"
 import { Star } from "./star"
 
 export class Door {

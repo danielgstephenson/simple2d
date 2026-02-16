@@ -1,6 +1,6 @@
 import { angleToDir, combine, pi, range } from '../math'
 import { World } from '../world/world'
-import { Agent } from './agent/agent'
+import { Agent } from './circle/agent'
 
 export class Transporter {
   static radius = 4

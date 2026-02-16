@@ -1,4 +1,4 @@
-import { Agent } from '../entities/agent/agent'
+import { Agent } from '../entities/circle/agent'
 import { range } from '../math'
 import { World } from './world'
 
