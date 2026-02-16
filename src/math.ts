@@ -6,7 +6,7 @@ export const X = 0
 export const Y = 1
 
 export function range(a: number, b?: number): number[] {
-  if (b == null) return range(0, a - 1)
+  if (b == null) return [...Array(a).keys()]
   return [...Array(b - a + 1).keys()].map(i => a + i)
 }
 

@@ -23,12 +23,12 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#000000"
      inkscape:document-units="px"
-     inkscape:zoom="22.627417"
-     inkscape:cx="-13.435029"
-     inkscape:cy="37.940698"
+     inkscape:zoom="90.509668"
+     inkscape:cx="-14.661417"
+     inkscape:cy="31.317096"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="1912"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
@@ -82,7 +82,8 @@
        style="fill:#1a1a1a;fill-opacity:1;stroke-width:5.969;stroke-linejoin:round"
        d="M 0.10651667,-4.3381023 3.6926343,-2.5082148 3.3750472,2.4936117 0,5.4663993 -6,6 -8.5082148,13.491785 -4,20 v 8 l -8,7 -9,-3 -11,-9 0.902767,-8.29239 6.75502,-4.7830891 L -17,10 -9.6920734,12.431261 -7,4 l 0.4631713,-4.73980046 2.054809,-2.71378914 z"
        sodipodi:nodetypes="ccccccccccccccccccc"
-       role="boundary" />
+       role="boundary"
+       inkscape:label="boundary-1" />
     <path
        id="boundary-2"
        style="fill:#1a1a1a;fill-opacity:1;stroke-width:5.969;stroke-linejoin:round"
@@ -148,28 +149,22 @@
     <circle
        style="fill:#0053ff;fill-opacity:1;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:7.55906, 7.55906"
        id="player"
-       cx="1.5"
-       cy="-1.5"
+       cx="-2"
+       cy="1"
        r="0.5"
        role="player" />
-    <g
+    <circle
+       style="fill:#ffffff;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="transporter1"
-       transform="translate(-12.974386,29.098502)"
-       style="fill:#ffffff;fill-opacity:0.119048"
-       role="transporter">
-      <path
-         style="fill:none;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWide)"
-         d="M 0,0 -3.909411,7.767503"
-         id="arrow1"
-         sodipodi:nodetypes="cc"
-         role="arrow" />
-      <circle
-         style="fill:#ffffff;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-         id="circle1"
-         cx="0"
-         cy="0"
-         r="4"
-         role="circle" />
-    </g>
+       cx="-14"
+       cy="29"
+       r="1.5"
+       role="transporter" />
+    <path
+       style="fill:none;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWide)"
+       d="M -14.090589,29.232497 -18,37"
+       id="arrow1"
+       sodipodi:nodetypes="cc"
+       role="arrow" />
   </g>
 </svg>

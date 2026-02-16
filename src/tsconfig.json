@@ -7,8 +7,8 @@
       "ESNext",
       "dom"
     ],
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "../dist",
     "resolveJsonModule": true,
     "rootDir": ".",
@@ -16,6 +16,12 @@
     "sourceMap": true,
     "target": "ESNext"
   },
-  "include": ["**/*","*.json","*.d.ts"],
-  "exclude": ["../dist/**/*"]
+  "include": [
+    "**/*",
+    "*.json",
+    "*.d.ts"
+  ],
+  "exclude": [
+    "../dist/**/*"
+  ]
 }

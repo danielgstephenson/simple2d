@@ -5,46 +5,59 @@ import { DoorSummary } from '../entities/door'
 import { Floor } from '../entities/floor'
 import { RockSummary } from '../entities/circle/rock'
 import { StarSummary } from '../entities/star'
-import { TransporterSummary } from '../entities/transporter'
-import { getChildById, getChildrenByRole, getCircleCenter, getCircleRadius, getPathPoints, parseSvg } from '../svg'
+import { Transporter, TransporterSummary } from '../entities/transporter'
 import { World } from './world'
+import { findElement, getCenter, getPathPoints, getRadius, getSvg } from '../svg'
+import { getDistance } from '../math'
 
 export class Level extends World {
-  player: Player
   floor: Floor
   summary: LevelSummary
 
   constructor() {
     super()
-    const svgObject = parseSvg('test.svg')
-    const layer1 = getChildById(svgObject, 'layer1')
-    this.player = this.addPlayer(getCircleCenter(getChildById(layer1, 'player')))
-    getChildrenByRole(layer1, 'boundary').forEach(node => {
-      this.boundaries.push(getPathPoints(node))
+    const svg = getSvg('test.svg')
+    const playerElement = findElement(svg, '[role="player"]')
+    this.addPlayer(getCenter(playerElement))
+    svg.find('[role="boundary"]').forEach(element => {
+      this.boundaries.push(getPathPoints(element))
     })
-    getChildrenByRole(layer1, 'agent').forEach(node => {
-      const position = getCircleCenter(node)
-      this.addAgent(position)
+    svg.find('[role="agent"]').forEach(element => {
+      this.addAgent(getCenter(element))
     })
-    getChildrenByRole(layer1, 'rock').forEach(node => {
-      const position = getCircleCenter(node)
-      const radius = getCircleRadius(node)
+    svg.find('[role="rock"]').forEach(element => {
+      const position = getCenter(element)
+      const radius = getRadius(element)
       this.addRock(position, radius)
     })
-    getChildrenByRole(layer1, 'transporter').forEach(group => {
-      console.log(group.attributes)
-      const circle = getChildrenByRole(group, 'circle')[0]
-      console.log(circle.attributes)
+    const arrows = [...svg.find('[role="arrow"]')].map(element => {
+      const points = getPathPoints(element)
+      console.log('points', points)
+      return points
+    })
+    console.log('arrows', arrows)
+    svg.find('[role="transporter"]').forEach(element => {
+      const position = getCenter(element)
+      const arrow = arrows.find(points => {
+        const start = points[0]
+        console.log('start', start)
+        const distance = getDistance(start, position)
+        return distance <= Transporter.radius
+      })
+      if (arrow == null) throw new Error('arrow not found')
+      const target = arrow[1]
+      this.addTransporter(position, target)
     })
     this.floor = new Floor(this)
     this.summary = this.summarize()
   }
 
+
   postStep(): void {
     this.summary = this.summarize()
-    if (this.player.dead) {
-      this.paused = true
-    }
+    this.players.forEach(player => {
+      if (player.dead) this.paused = true
+    })
   }
 
   summarize(): LevelSummary {

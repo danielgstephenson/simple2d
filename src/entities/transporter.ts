@@ -3,7 +3,7 @@ import { World } from '../world/world'
 import { Agent } from './circle/agent'
 
 export class Transporter {
-  static radius = 4
+  static radius = 1.5
   world: World
   charge = 0
   interval = 5

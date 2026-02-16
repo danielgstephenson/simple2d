@@ -23,6 +23,7 @@
     "@svgdotjs/svg.js": "^3.2.5",
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
+    "@types/svgdom": "^0.1.2",
     "express": "^5.2.1",
     "fs-extra": "^11.3.2",
     "nanotimer": "^0.3.15",
