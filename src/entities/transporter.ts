@@ -3,10 +3,10 @@ import { World } from '../world/world'
 import { Agent } from './circle/agent'
 
 export class Transporter {
-  static radius = 1.5
+  static radius = 1.3
   world: World
   charge = 0
-  interval = 5
+  interval = 3
   center: number[]
   target: number[]
   shell: number[][]
@@ -29,6 +29,7 @@ export class Transporter {
     this.charge = 0
     if (agent.blade != null) agent.blade.detach()
     agent.position = this.target
+    agent.spawnPoint = this.target
   }
 
   summarize(): TransporterSummary {

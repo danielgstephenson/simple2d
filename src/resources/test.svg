@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#000000"
      inkscape:document-units="px"
-     inkscape:zoom="90.509668"
-     inkscape:cx="-14.661417"
-     inkscape:cy="31.317096"
+     inkscape:zoom="16"
+     inkscape:cx="-19.125"
+     inkscape:cy="25.03125"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -71,6 +71,26 @@
          transform="rotate(180,0.125,0)"
          sodipodi:nodetypes="ccc"
          id="path1" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWide-3"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path1-6" />
     </marker>
   </defs>
   <g
@@ -155,15 +175,28 @@
        role="player" />
     <circle
        style="fill:#ffffff;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       id="transporter1"
-       cx="-14"
-       cy="29"
-       r="1.5"
+       id="transporter-1"
+       cx="-15"
+       cy="31"
+       r="2"
+       role="transporter" />
+    <circle
+       style="fill:#ffffff;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="transporter-2"
+       cx="-30"
+       cy="30"
+       r="2"
        role="transporter" />
     <path
        style="fill:none;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWide)"
-       d="M -14.090589,29.232497 -18,37"
-       id="arrow1"
+       d="m -15.107055,31.674225 -2.00343,4.701425"
+       id="arrow-1"
+       sodipodi:nodetypes="cc"
+       role="arrow" />
+    <path
+       style="fill:none;fill-opacity:0.119048;stroke:#ffffff;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWide-3)"
+       d="m -30,30 4,-4"
+       id="arrow-1-5"
        sodipodi:nodetypes="cc"
        role="arrow" />
   </g>

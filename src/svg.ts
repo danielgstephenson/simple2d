@@ -51,3 +51,7 @@ export function findElement(element: Element, selector: string): Element {
   }
   return child
 }
+
+export function findElements(element: Element, selector: string): Element[] {
+  return [...element.find(selector)]
+}

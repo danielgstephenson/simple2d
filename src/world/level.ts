@@ -1,13 +1,12 @@
 import { AgentSummary } from '../entities/circle/agent'
-import { Player } from '../entities/circle/player'
 import { BladeSummary } from '../entities/circle/blade'
 import { DoorSummary } from '../entities/door'
 import { Floor } from '../entities/floor'
 import { RockSummary } from '../entities/circle/rock'
 import { StarSummary } from '../entities/star'
-import { Transporter, TransporterSummary } from '../entities/transporter'
+import { TransporterSummary } from '../entities/transporter'
 import { World } from './world'
-import { findElement, getCenter, getPathPoints, getRadius, getSvg } from '../svg'
+import { findElement, findElements, getCenter, getPathPoints, getRadius, getSvg } from '../svg'
 import { getDistance } from '../math'
 
 export class Level extends World {
@@ -30,19 +29,16 @@ export class Level extends World {
       const radius = getRadius(element)
       this.addRock(position, radius)
     })
-    const arrows = [...svg.find('[role="arrow"]')].map(element => {
+    const arrows = findElements(svg, '[role="arrow"]').map(element => {
       const points = getPathPoints(element)
-      console.log('points', points)
       return points
     })
-    console.log('arrows', arrows)
     svg.find('[role="transporter"]').forEach(element => {
       const position = getCenter(element)
       const arrow = arrows.find(points => {
         const start = points[0]
-        console.log('start', start)
         const distance = getDistance(start, position)
-        return distance <= Transporter.radius
+        return distance <= 2
       })
       if (arrow == null) throw new Error('arrow not found')
       const target = arrow[1]

@@ -6,7 +6,7 @@ import { DoorSummary } from './entities/door'
 import { RockSummary } from './entities/circle/rock'
 import { Star, StarSummary } from './entities/star'
 import { Transporter, TransporterSummary } from './entities/transporter'
-import { angleToDir, combine, dirFromTo, getDistance, pi, range } from './math'
+import { combine, dirFromTo, getDistance, pi, range } from './math'
 import { Layout, LevelSummary } from './world/level'
 
 
@@ -19,7 +19,7 @@ export class Renderer {
   renderScale = 1
   floorColor = 'hsl(0,0%,6%)'
   wallColor = 'hsl(0,0%,0%)'
-  transportColor = 'hsla(0, 0%, 100%, 0.3)'
+  transportColor = 'hsla(0, 0%, 100%, 0.6)'
   doorColor = 'hsl(36, 100%, 6%)'
   starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
@@ -106,22 +106,11 @@ export class Renderer {
     this.resetContext()
     this.context.strokeStyle = this.transportColor
     this.context.lineCap = 'round'
-    this.context.lineWidth = 0.05
-    const shell = range(8).map(i => {
-      const angle = i / 8 * 2 * pi
-      const dir = angleToDir(angle)
-      return combine(1, transporter.center, Transporter.radius, dir)
-    })
+    this.context.lineWidth = 0.1
     this.context.beginPath()
     const x = transporter.center[0]
     const y = transporter.center[1]
     this.context.arc(x, y, Transporter.radius, 0, 2 * Math.PI)
-    for (const a of shell) {
-      for (const b of shell) {
-        this.context.moveTo(a[0], a[1])
-        this.context.lineTo(b[0], b[1])
-      }
-    }
     this.context.stroke()
     if (transporter.charge === 0) return
     this.context.strokeStyle = this.transportColor
