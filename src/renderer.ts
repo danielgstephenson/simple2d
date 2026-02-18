@@ -20,7 +20,7 @@ export class Renderer {
   floorColor = 'hsl(0,0%,6%)'
   wallColor = 'hsl(0,0%,0%)'
   transportColor = 'hsla(0, 0%, 100%, 0.6)'
-  doorColor = 'hsl(36, 100%, 6%)'
+  doorColor = 'hsl(36, 100%, 4%)'
   starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
     'hsl(220, 100%, 50%)',
@@ -55,9 +55,7 @@ export class Renderer {
     this.context.save()
     this.setupCanvas()
     this.followPlayer()
-    // this.drawBoundary(this.layout.boundary)
     this.drawBoundaries(this.layout)
-    this.drawFloor(this.layout)
     this.summary.transporters.forEach(transporter => this.drawTransporter(transporter))
     this.summary.doors.forEach(door => this.drawDoor(door))
     this.summary.blades.forEach(blade => this.drawSpring(blade))
@@ -68,21 +66,6 @@ export class Renderer {
     this.summary.stars.forEach(star => this.drawStar(star))
     this.layout.walls.forEach(w => this.drawWall(w))
     this.context.restore()
-  }
-
-  drawBoundary(boundary: number[][]): void {
-    this.context.fillStyle = this.wallColor
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
-    this.resetContext()
-    this.context.imageSmoothingEnabled = false
-    this.context.fillStyle = this.floorColor
-    this.context.beginPath()
-    boundary.forEach((vertex, i) => {
-      if (i === 0) this.context.moveTo(vertex[0], vertex[1])
-      else this.context.lineTo(vertex[0], vertex[1])
-    })
-    this.context.fill()
-    this.context.clip()
   }
 
   drawBoundaries(layout: Layout): void {
@@ -99,7 +82,10 @@ export class Renderer {
       })
     })
     this.context.fill()
+    this.context.save()
     this.context.clip()
+    this.drawFloor(this.layout)
+    this.context.restore()
   }
 
   drawTransporter(transporter: TransporterSummary): void {
@@ -125,17 +111,13 @@ export class Renderer {
   }
 
   drawFloor(layout: Layout): void {
-    this.context.strokeStyle = this.transportColor
-    this.context.lineCap = 'round'
-    this.context.lineWidth = 0.03
     layout.floorPoints.forEach((point) => {
-      const lightness = 4
       const x = point[0]
       const y = point[1]
       const radius = 4
       const gradient = this.context.createRadialGradient(x, y, 0, x, y, radius)
-      gradient.addColorStop(0, `hsla(0,0%,${lightness}%,0.5)`)
-      gradient.addColorStop(1, `hsla(0,0%,${lightness}%,0)`)
+      gradient.addColorStop(0, `hsla(0,0%,4%,0.5)`)
+      gradient.addColorStop(1, `hsla(0,0%,4%,0)`)
       this.context.fillStyle = gradient
       this.context.beginPath()
       this.context.arc(x, y, radius, 0, 2 * Math.PI)
@@ -157,38 +139,57 @@ export class Renderer {
   }
 
   drawDoor(door: DoorSummary): void {
-    const shell = door.shell
     this.resetContext()
     this.context.fillStyle = this.doorColor
     this.context.lineWidth = 0.1
     this.context.beginPath()
     const xs: number[] = []
     const ys: number[] = []
-    shell.forEach((point, i) => {
+    door.shell.forEach((point, i) => {
       if (i === 0) this.context.moveTo(point[0], point[1])
       else this.context.lineTo(point[0], point[1])
       xs.push(point[0])
       ys.push(point[1])
     })
     this.context.fill()
-    this.context.strokeStyle = this.starColor
-    this.context.lineWidth = 0.05
+    this.context.save()
+    this.context.clip()
+    const xMax = Math.max(...xs)
+    const xMin = Math.min(...xs)
+    const yMax = Math.max(...ys)
+    const yMin = Math.min(...ys)
+    const xRange = xMax - xMin
+    const yRange = yMax - yMin
+    const knotRadius = 0.5 * Math.max(xRange, yRange)
+    door.knots.forEach(point => {
+      const x = door.center[0] + point[0]
+      const y = door.center[1] + point[1]
+      const gradient = this.context.createRadialGradient(x, y, 0, x, y, knotRadius)
+      gradient.addColorStop(0, `hsla(36,50%,7%,1)`)
+      gradient.addColorStop(1, `hsla(36,50%,7%,0)`)
+      this.context.fillStyle = gradient
+      this.context.beginPath()
+      this.context.arc(x, y, knotRadius, 0, 2 * Math.PI)
+      this.context.fill()
+    })
+    this.context.restore()
+    this.context.fillStyle = this.wallColor
+    this.context.globalAlpha = 0.5
     this.context.beginPath()
     const origin = door.center
-    const radius = Star.radius + this.context.lineWidth
     range(5).forEach(i => {
       const angle0 = (0.5 + 0.4 * i) * pi
-      const x0 = origin[0] + Math.cos(angle0) * radius
-      const y0 = origin[1] + Math.sin(angle0) * radius
+      const x0 = origin[0] + Math.cos(angle0) * Star.radius
+      const y0 = origin[1] + Math.sin(angle0) * Star.radius
       if (i === 0) this.context.moveTo(x0, y0)
       else this.context.lineTo(x0, y0)
       const angle1 = angle0 + 0.2 * pi
-      const x1 = origin[0] + Math.cos(angle1) * radius * 0.45
-      const y1 = origin[1] + Math.sin(angle1) * radius * 0.45
+      const x1 = origin[0] + Math.cos(angle1) * Star.radius * 0.45
+      const y1 = origin[1] + Math.sin(angle1) * Star.radius * 0.45
       this.context.lineTo(x1, y1)
     })
     this.context.closePath()
-    this.context.stroke()
+    this.context.fill()
   }
 
   drawStar(star: StarSummary): void {
@@ -302,7 +303,7 @@ export class Renderer {
   setupCanvas(): void {
     this.canvas.width = window.innerWidth * this.renderScale
     this.canvas.height = window.innerHeight * this.renderScale
-    // this.context.imageSmoothingEnabled = false
+    this.context.imageSmoothingEnabled = false
   }
 
   resetContext(): void {

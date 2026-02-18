@@ -1,4 +1,4 @@
-import { add, clamp, combine, mean, range, sub } from "../math"
+import { add, clamp, combine, meanPoint, range, sub } from "../math"
 import { World } from "../world/world"
 import { Player } from "./circle/player"
 import { Star } from "./star"
@@ -23,24 +23,25 @@ export class Door {
     this.shell = structuredClone(shell)
     this.index = world.doors.length
     this.world.doors.push(this)
-    const xs = shell.map(p => p[0])
-    const ys = shell.map(p => p[1])
-    this.center = [mean(xs), mean(ys)]
+    this.center = meanPoint(shell)
     this.spawnCenter = structuredClone(this.center)
     this.openCenter = add(this.spawnCenter, vector)
-    const xMax = Math.max(...xs)
-    const xMin = Math.min(...xs)
-    const yMax = Math.max(...ys)
-    const yMin = Math.min(...ys)
-    const xRange = xMax - xMin
-    const yRange = yMax - yMin
-    const count = Math.ceil(xRange * yRange / 5)
-    for (const _ of range(count)) {
-      const x = xMin + xRange * Math.random()
-      const y = yMin + yRange * Math.random()
-      const knot = [x, y]
-      this.knots.push(knot)
-    }
+    this.knots.push([0, 0])
+    // const xs = shell.map(p => p[0])
+    // const ys = shell.map(p => p[1])
+    // const xMax = Math.max(...xs)
+    // const xMin = Math.min(...xs)
+    // const yMax = Math.max(...ys)
+    // const yMin = Math.min(...ys)
+    // const xRange = xMax - xMin
+    // const yRange = yMax - yMin
+    // const count = Math.ceil(xRange * yRange / 5)
+    // for (const _ of range(count)) {
+    //   const x = xRange * (Math.random() - 0.5)
+    //   const y = yRange * (Math.random() - 0.5)
+    //   const knot = [x, y]
+    //   this.knots.push(knot)
+    // }
   }
 
   onStep(dt: number): void {
@@ -67,7 +68,8 @@ export class Door {
   summarize(): DoorSummary {
     return {
       shell: this.shell,
-      center: this.center
+      center: this.center,
+      knots: this.knots
     }
   }
 }
@@ -75,5 +77,6 @@ export class Door {
 export interface DoorSummary {
   shell: number[][]
   center: number[]
+  knots: number[][]
 }
 

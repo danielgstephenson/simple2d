@@ -16,19 +16,19 @@ export function rayCastSegment(rayStart: number[], rayVector: number[], segment:
   return [intersection]
 }
 
-export function rayCastWall(rayStart: number[], rayVector: number[], wall: number[][]): number[][] {
+export function rayCastShell(rayStart: number[], rayVector: number[], shell: number[][]): number[][] {
   const intersections: number[][] = []
-  range(wall.length).forEach(i => {
-    const j = i > 0 ? i - 1 : wall.length - 1
-    const segment = [wall[i], wall[j]]
+  range(shell.length).forEach(i => {
+    const j = i > 0 ? i - 1 : shell.length - 1
+    const segment = [shell[i], shell[j]]
     const segmentIntersections = rayCastSegment(rayStart, rayVector, segment)
     intersections.push(...segmentIntersections)
   })
   return intersections
 }
 
-export function insideWall(point: number[], wall: number[][]): boolean {
-  const intersections = rayCastWall(point, [1, 0], wall)
+export function insideShell(point: number[], shell: number[][]): boolean {
+  const intersections = rayCastShell(point, [1, 0], shell)
   return (intersections.length % 2) === 1
 }
 

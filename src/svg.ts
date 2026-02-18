@@ -21,12 +21,11 @@ export function flipPoint(point: number[]): number[] {
 }
 
 export function getPathPoints(element: Element): number[][] {
-  const localPath = element.attr('d')
-  if (typeof localPath !== 'string') {
-    throw new Error('typeof svgPath !== "string"')
+  const pathString = element.attr('d')
+  if (typeof pathString !== 'string') {
+    throw new Error('typeof pathString !== "string"')
   }
-
-  const points = pointsOnPath(localPath).flat().map(p => flipPoint(p))
+  const points = pointsOnPath(pathString).flat().map(p => flipPoint(p))
   const distance = getDistance(points[0], points[points.length - 1])
   if (distance === 0) points.pop()
   return points

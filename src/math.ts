@@ -25,9 +25,10 @@ export function mean(array: number[]): number {
   return sum(array) / array.length
 }
 
-export function average(array: number[]): number {
-  if (array.length === 0) return 0
-  return sum(array) / array.length
+export function meanPoint(points: number[][]): number[] {
+  const xs = points.map(p => p[0])
+  const ys = points.map(p => p[1])
+  return [mean(xs), mean(ys)]
 }
 
 export function dot(x: number[], y: number[]): number {

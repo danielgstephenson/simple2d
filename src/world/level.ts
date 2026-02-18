@@ -7,7 +7,8 @@ import { StarSummary } from '../entities/star'
 import { TransporterSummary } from '../entities/transporter'
 import { World } from './world'
 import { findElement, findElements, getCenter, getPathPoints, getRadius, getSvg } from '../svg'
-import { getDistance } from '../math'
+import { getDistance, meanPoint, sub } from '../math'
+import { insideShell } from '../raycast'
 
 export class Level extends World {
   floor: Floor
@@ -18,13 +19,13 @@ export class Level extends World {
     const svg = getSvg('test.svg')
     const playerElement = findElement(svg, '[role="player"]')
     this.addPlayer(getCenter(playerElement))
-    svg.find('[role="boundary"]').forEach(element => {
+    findElements(svg, '[role="boundary"]').forEach(element => {
       this.boundaries.push(getPathPoints(element))
     })
-    svg.find('[role="agent"]').forEach(element => {
+    findElements(svg, '[role="agent"]').forEach(element => {
       this.addAgent(getCenter(element))
     })
-    svg.find('[role="rock"]').forEach(element => {
+    findElements(svg, '[role="rock"]').forEach(element => {
       const position = getCenter(element)
       const radius = getRadius(element)
       this.addRock(position, radius)
@@ -33,7 +34,7 @@ export class Level extends World {
       const points = getPathPoints(element)
       return points
     })
-    svg.find('[role="transporter"]').forEach(element => {
+    findElements(svg, '[role="transporter"]').forEach(element => {
       const position = getCenter(element)
       const arrow = arrows.find(points => {
         const start = points[0]
@@ -43,6 +44,19 @@ export class Level extends World {
       if (arrow == null) throw new Error('arrow not found')
       const target = arrow[1]
       this.addTransporter(position, target)
+    })
+    findElements(svg, '[role="door"]').forEach(element => {
+      const shell = getPathPoints(element)
+      const arrow = arrows.find(points => {
+        return insideShell(points[0], shell)
+      })
+      if (arrow == null) throw new Error('arrow not found')
+      const vector = sub(arrow[1], arrow[0])
+      this.addDoor(vector, shell)
+    })
+    findElements(svg, '[role="star"]').forEach(element => {
+      const position = meanPoint(getPathPoints(element))
+      this.addStar(position)
     })
     this.floor = new Floor(this)
     this.summary = this.summarize()
