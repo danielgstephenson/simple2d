@@ -20,7 +20,11 @@ export class Renderer {
   floorColor = 'hsl(0,0%,6%)'
   wallColor = 'hsl(0,0%,0%)'
   transportColor = 'hsla(0, 0%, 100%, 0.6)'
-  doorColor = 'hsl(36, 100%, 4%)'
+  doorColors = [
+    'hsl(36, 100%, 4%)',
+    'hsla(36,50%,7%,1)',
+    'hsla(0,0%,4%,0)'
+  ]
   starColor = 'hsl(60, 100%, 40%)'
   agentColors = [
     'hsl(220, 100%, 50%)',
@@ -80,11 +84,12 @@ export class Renderer {
         if (i === 0) this.context.moveTo(vertex[0], vertex[1])
         else this.context.lineTo(vertex[0], vertex[1])
       })
+      this.context.closePath()
     })
     this.context.fill()
     this.context.save()
     this.context.clip()
-    this.drawFloor(this.layout)
+    //this.drawFloor(this.layout)
     this.context.restore()
   }
 
@@ -140,7 +145,7 @@ export class Renderer {
 
   drawDoor(door: DoorSummary): void {
     this.resetContext()
-    this.context.fillStyle = this.doorColor
+    this.context.fillStyle = this.doorColors[0]
     this.context.lineWidth = 0.1
     this.context.beginPath()
     const xs: number[] = []
@@ -165,8 +170,8 @@ export class Renderer {
       const x = door.center[0] + point[0]
       const y = door.center[1] + point[1]
       const gradient = this.context.createRadialGradient(x, y, 0, x, y, knotRadius)
-      gradient.addColorStop(0, `hsla(36,50%,7%,1)`)
-      gradient.addColorStop(1, `hsla(36,50%,7%,0)`)
+      gradient.addColorStop(0, this.doorColors[1])
+      gradient.addColorStop(1, this.doorColors[2])
       this.context.fillStyle = gradient
       this.context.beginPath()
       this.context.arc(x, y, knotRadius, 0, 2 * Math.PI)

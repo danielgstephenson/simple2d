@@ -5,6 +5,7 @@ import { dot, getLength, whichMax } from '../math'
 import { actionVectors } from '../actionVectors'
 import { Layout, LevelSummary } from '../world/level'
 
+
 export class Client {
   renderer = new Renderer()
   input = new Input()

@@ -43,7 +43,7 @@ export class Input {
   }
 
   onwheel(event: WheelEvent): void {
-    const change = -0.002 * event.deltaY
+    const change = -0.005 * event.deltaY
     this.zoom = clamp(this.minZoom, this.maxZoom, this.zoom + change)
   }
 
