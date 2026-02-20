@@ -20,7 +20,7 @@
     "**/*",
     "*.json",
     "*.d.ts"
-  ],
+, "scripts"  ],
   "exclude": [
     "../dist/**/*"
   ]

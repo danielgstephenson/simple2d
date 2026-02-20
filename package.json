@@ -5,7 +5,7 @@
   "author": "",
   "scripts": {
     "prebuild": "rimraf dist",
-    "copy-resources": "copyfiles --up 1 \"src/resources/**/*\" dist/",
+    "copy-resources": "tsx src/scripts/copyFiles.ts",
     "build:server": "npx tsc -build ./src",
     "build:client": "npx parcel build ./src/public/index.html --dist-dir \"dist/public\"",
     "build": "npm run prebuild && npm run build:server && npm run build:client && npm run copy-resources",
@@ -14,10 +14,10 @@
   },
   "devDependencies": {
     "@types/nanotimer": "^0.3.2",
-    "@typescript-eslint/eslint-plugin": "^8.52.0",
-    "@typescript-eslint/parser": "^8.52.0",
-    "copyfiles": "^2.4.1",
-    "eslint": "^9.39.2"
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "eslint": "^10.0.1",
+    "tsx": "^4.21.0"
   },
   "dependencies": {
     "@svgdotjs/svg.js": "^3.2.5",
